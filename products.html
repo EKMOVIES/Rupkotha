@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>প্রোডাক্টস - রূপকথা</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/dark-theme.css" />
+    <link rel="stylesheet" href="css/responsive.css" />
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar" id="mainNav">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo">
+                <i class="fas fa-spa"></i>
+                <span>রূপকথা</span>
+                <small>Beauty</small>
+            </a>
+            <button class="nav-toggle" id="navToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="index.html">হোম</a></li>
+                <li><a href="products.html" class="active">প্রোডাক্ট</a></li>
+                <li><a href="blog.html">ব্লগ</a></li>
+                <li><a href="cart.html">কার্ট <span class="cart-badge" id="cartBadge">0</span></a></li>
+                <li class="auth-links" id="authLinks">
+                    <a href="login.html" class="btn-outline-light">লগইন</a>
+                    <a href="register.html" class="btn-primary">রেজিস্টার</a>
+                </li>
+                <li class="user-menu" id="userMenu" style="display:none;">
+                    <div class="user-dropdown">
+                        <button class="user-btn" id="userBtn">
+                            <img id="userAvatar" src="https://ui-avatars.com/api/?name=User&background=8B5CF6&color=fff&size=32" alt="Avatar" />
+                            <span id="userName">User</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="dropdown-menu" id="dropdownMenu">
+                            <a href="profile.html">প্রোফাইল</a>
+                            <a href="orders.html">অর্ডার</a>
+                            <a href="admin.html" id="adminLink" style="display:none;">অ্যাডমিন</a>
+                            <hr />
+                            <a href="#" id="logoutBtn">লগআউট</a>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Products Section -->
+    <section class="featured" style="padding-top: 120px;">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">আমাদের কালেকশন</span>
+                <h2>সব <span class="highlight">প্রোডাক্ট</span></h2>
+                <p>আমাদের সকল মেকআপ প্রোডাক্ট এক জায়গায়</p>
+            </div>
+            <div class="product-grid" id="allProductsGrid">
+                <!-- Products will be loaded here -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <a href="index.html" class="nav-logo">
+                        <i class="fas fa-spa"></i>
+                        <span>রূপকথা</span>
+                        <small>Beauty</small>
+                    </a>
+                    <p>বাংলাদেশের প্রথম প্রিমিয়াম মেকআপ ব্র্যান্ড।</p>
+                </div>
+                <div class="footer-links">
+                    <h4>কুইক লিংক</h4>
+                    <ul>
+                        <li><a href="products.html">প্রোডাক্ট</a></li>
+                        <li><a href="blog.html">ব্লগ</a></li>
+                        <li><a href="about.html">আমাদের সম্পর্কে</a></li>
+                    </ul>
+                </div>
+                <div class="footer-contact">
+                    <h4>যোগাযোগ</h4>
+                    <p><i class="fas fa-map-marker-alt"></i> ঢাকা, বাংলাদেশ</p>
+                    <p><i class="fas fa-envelope"></i> hello@rupkotha.com</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; ২০২৬ <strong>রূপকথা</strong> – সর্বস্বত্ব সংরক্ষিত।</p>
+            </div>
+        </div>
+    </footer>
+
+    <div id="toast" class="toast"></div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script type="module">
+        import { supabase } from './js/config.js';
+        import { renderProducts, updateCartBadge } from './js/products.js';
+        import { checkAuth, updateAuthUI } from './js/auth.js';
+
+        // Initialize
+        async function init() {
+            const user = await checkAuth();
+            updateAuthUI(user);
+            updateCartBadge();
+            
+            // Load all products
+            const { data: products } = await supabase
+                .from('products')
+                .select('*')
+                .order('created_at', { ascending: false });
+            
+            renderProducts(products || [], 'allProductsGrid');
+        }
+        
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>

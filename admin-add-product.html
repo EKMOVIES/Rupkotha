@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>অ্যাডমিন - প্রোডাক্ট যোগ করুন</title>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.5.1/css/all.css" />
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/dark-theme.css" />
+</head>
+<body>
+    <!-- Navigation Include (Same as index.html) -->
+    <nav class="navbar" id="mainNav">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo">
+                <i class="fas fa-spa"></i>
+                <span>রূপকথা</span>
+                <small>Beauty</small>
+            </a>
+            <button class="nav-toggle" id="navToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="index.html">হোম</a></li>
+                <li><a href="products.html">প্রোডাক্ট</a></li>
+                <li><a href="cart.html">কার্ট <span class="cart-badge" id="cartBadge">0</span></a></li>
+                <li class="auth-links" id="authLinks">
+                    <a href="login.html" class="btn-outline-light">লগইন</a>
+                    <a href="register.html" class="btn-primary">রেজিস্টার</a>
+                </li>
+                <li class="user-menu" id="userMenu" style="display:none;">
+                    <div class="user-dropdown">
+                        <button class="user-btn" id="userBtn">
+                            <img id="userAvatar" src="https://ui-avatars.com/api/?name=User&background=8B5CF6&color=fff&size=32" alt="Avatar" />
+                            <span id="userName">User</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="dropdown-menu" id="dropdownMenu">
+                            <a href="profile.html">প্রোফাইল</a>
+                            <a href="orders.html">অর্ডার</a>
+                            <a href="admin-add-product.html" id="adminLink" style="display:none;">📦 প্রোডাক্ট যোগ</a>
+                            <hr />
+                            <a href="#" id="logoutBtn">লগআউট</a>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Admin Form -->
+    <section style="padding-top: 120px; padding-bottom: 60px;">
+        <div class="container" style="max-width: 700px; margin: 0 auto;">
+            <div class="section-header">
+                <span class="section-tag">অ্যাডমিন</span>
+                <h2>✨ নতুন প্রোডাক্ট যোগ করুন</h2>
+            </div>
+
+            <form id="productForm" style="background: var(--dark-card); padding: 40px; border-radius: var(--radius); border: 1px solid var(--dark-border);">
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600;">প্রোডাক্টের নাম *</label>
+                    <input type="text" id="productName" required 
+                           style="width: 100%; padding: 12px; background: var(--dark); border: 1px solid var(--dark-border); border-radius: 8px; color: white; font-size: 16px;" />
+                </div>
+
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600;">বিবরণ *</label>
+                    <textarea id="productDesc" required rows="4"
+                              style="width: 100%; padding: 12px; background: var(--dark); border: 1px solid var(--dark-border); border-radius: 8px; color: white; font-size: 16px;"></textarea>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                    <div>
+                        <label style="display: block; margin-bottom: 8px; font-weight: 600;">দাম (৳) *</label>
+                        <input type="number" id="productPrice" required step="0.01"
+                               style="width: 100%; padding: 12px; background: var(--dark); border: 1px solid var(--dark-border); border-radius: 8px; color: white; font-size: 16px;" />
+                    </div>
+                    <div>
+                        <label style="display: block; margin-bottom: 8px; font-weight: 600;">স্টক</label>
+                        <input type="number" id="productStock" value="10"
+                               style="width: 100%; padding: 12px; background: var(--dark); border: 1px solid var(--dark-border); border-radius: 8px; color: white; font-size: 16px;" />
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600;">ক্যাটাগরি *</label>
+                    <select id="productCategory" required
+                            style="width: 100%; padding: 12px; background: var(--dark); border: 1px solid var(--dark-border); border-radius: 8px; color: white; font-size: 16px;">
+                        <option value="">ক্যাটাগরি নির্বাচন করুন</option>
+                        <option value="ফাউন্ডেশন">ফাউন্ডেশন</option>
+                        <option value="লিপস্টিক">লিপস্টিক</option>
+                        <option value="আই শ্যাডো">আই শ্যাডো</option>
+                        <option value="ব্লাশ">ব্লাশ</option>
+                        <option value="কনসিলার">কনসিলার</option>
+                        <option value="ব্রাশ">ব্রাশ</option>
+                    </select>
+                </div>
+
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600;">প্রোডাক্ট ইমেজ *</label>
+                    <input type="file" id="productImage" accept="image/*" required
+                           style="width: 100%; padding: 12px; background: var(--dark); border: 1px solid var(--dark-border); border-radius: 8px; color: white;" />
+                    <div id="imagePreview" style="margin-top: 10px;"></div>
+                    <small style="color: var(--text-secondary);">সাপোর্টেড ফরম্যাট: JPG, PNG, WebP (ম্যাক্স 10MB)</small>
+                </div>
+
+                <div style="margin-bottom: 20px; display: flex; align-items: center; gap: 12px;">
+                    <input type="checkbox" id="productFeatured" style="width: 20px; height: 20px;" />
+                    <label for="productFeatured" style="font-weight: 500;">ফিচার্ড প্রোডাক্ট হিসেবে দেখান</label>
+                </div>
+
+                <div id="messageBox" style="margin-bottom: 20px; display: none; padding: 12px; border-radius: 8px; text-align: center;">
+                </div>
+
+                <button type="submit" class="btn-primary" style="width: 100%; padding: 14px; font-size: 18px;" id="submitBtn">
+                    <i class="fas fa-cloud-upload-alt"></i> প্রোডাক্ট যোগ করুন
+                </button>
+            </form>
+        </div>
+    </section>
+
+    <!-- Toast -->
+    <div id="toast" class="toast"></div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script type="module">
+        import { supabase } from './js/config.js';
+        import { addProduct, isAdmin } from './js/admin.js';
+        import { checkAuth, updateAuthUI } from './js/auth.js';
+        import { updateCartBadge } from './js/products.js';
+        import { uploadImageToCloudinary } from './js/upload.js';
+
+        // Initialize Auth
+        const user = await checkAuth();
+        updateAuthUI(user);
+        updateCartBadge();
+
+        // Admin Check
+        const admin = await isAdmin();
+        if (!admin) {
+            document.querySelector('.section-header h2').innerHTML = '⛔ অ্যাক্সেস অস্বীকৃত';
+            document.querySelector('.section-header').innerHTML += '<p style="color: #EF4444;">শুধুমাত্র অ্যাডমিন ইউজার এই পেজ দেখতে পারেন।</p>';
+            document.getElementById('productForm').style.display = 'none';
+        }
+
+        // Form Submit
+        const form = document.getElementById('productForm');
+        const messageBox = document.getElementById('messageBox');
+        const submitBtn = document.getElementById('submitBtn');
+        const imageInput = document.getElementById('productImage');
+        const previewDiv = document.getElementById('imagePreview');
+
+        // Image Preview
+        imageInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    previewDiv.innerHTML = `<img src="${e.target.result}" style="max-width: 200px; max-height: 200px; border-radius: 8px; border: 2px solid var(--primary);" />`;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            // Disable button
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> আপলোড হচ্ছে...';
+            
+            try {
+                // Collect data
+                const name = document.getElementById('productName').value.trim();
+                const description = document.getElementById('productDesc').value.trim();
+                const price = parseFloat(document.getElementById('productPrice').value);
+                const category = document.getElementById('productCategory').value;
+                const stock = parseInt(document.getElementById('productStock').value);
+                const featured = document.getElementById('productFeatured').checked;
+                const imageFile = document.getElementById('productImage').files[0];
+
+                // Validation
+                if (!name || !description || !price || !category || !imageFile) {
+                    throw new Error('দয়া করে সব ফিল্ড পূরণ করুন এবং একটি ইমেজ নির্বাচন করুন!');
+                }
+
+                // Upload image to Cloudinary
+                const uploadResult = await uploadImageToCloudinary(imageFile);
+                
+                // Prepare product data
+                const productData = {
+                    name,
+                    description,
+                    price,
+                    category,
+                    image_url: uploadResult.url,
+                    stock,
+                    featured,
+                    created_at: new Date().toISOString()
+                };
+
+                // Save to Supabase
+                const newProduct = await addProduct(productData);
+                
+                showMessage('✅ প্রোডাক্ট সফলভাবে যোগ করা হয়েছে! 🎉', 'success');
+                form.reset();
+                previewDiv.innerHTML = '';
+                
+            } catch (error) {
+                console.error('Error:', error);
+                showMessage('❌ ' + error.message, 'error');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-cloud-upload-alt"></i> প্রোডাক্ট যোগ করুন';
+            }
+        });
+
+        function showMessage(message, type = 'info') {
+            messageBox.style.display = 'block';
+            messageBox.innerHTML = message;
+            messageBox.style.background = type === 'error' ? 'rgba(239, 68, 68, 0.1)' : 'rgba(16, 185, 129, 0.1)';
+            messageBox.style.color = type === 'error' ? '#EF4444' : '#10B981';
+            messageBox.style.border = `1px solid ${type === 'error' ? '#EF4444' : '#10B981'}`;
+            
+            setTimeout(() => {
+                messageBox.style.display = 'none';
+            }, 5000);
+        }
+    </script>
+</body>
+</html>

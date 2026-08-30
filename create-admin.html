@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>অ্যাডমিন তৈরি করুন</title>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.5.1/css/all.css" />
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/dark-theme.css" />
+</head>
+<body>
+    <div class="container" style="padding-top: 150px; max-width: 400px; margin: 0 auto;">
+        <div style="text-align: center; margin-bottom: 30px;">
+            <i class="fas fa-shield-alt" style="font-size: 3rem; color: var(--primary);"></i>
+            <h2>অ্যাডমিন তৈরি করুন</h2>
+            <p style="color: var(--text-secondary);">শুধুমাত্র একবার ব্যবহার করুন</p>
+        </div>
+
+        <form id="adminForm" style="background: var(--dark-card); padding: 30px; border-radius: var(--radius);">
+            <div style="margin-bottom: 15px;">
+                <input type="email" id="email" value="admin@rupkotha.com" readonly
+                       style="width: 100%; padding: 12px; background: var(--dark); border: 1px solid var(--dark-border); border-radius: 8px; color: white;" />
+            </div>
+            <div style="margin-bottom: 15px;">
+                <input type="text" id="fullName" value="Admin User" readonly
+                       style="width: 100%; padding: 12px; background: var(--dark); border: 1px solid var(--dark-border); border-radius: 8px; color: white;" />
+            </div>
+            <div style="margin-bottom: 15px;">
+                <input type="password" id="password" value="1234567890" readonly
+                       style="width: 100%; padding: 12px; background: var(--dark); border: 1px solid var(--dark-border); border-radius: 8px; color: white;" />
+            </div>
+            <button type="submit" class="btn-primary" style="width: 100%; padding: 12px;">
+                <i class="fas fa-user-cog"></i> অ্যাডমিন তৈরি করুন
+            </button>
+        </form>
+
+        <div id="message" style="margin-top: 15px; text-align: center;"></div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script type="module">
+        import { supabase } from './js/config.js';
+
+        document.getElementById('adminForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const fullName = document.getElementById('fullName').value;
+            const msg = document.getElementById('message');
+
+            msg.innerHTML = '<i class="fas fa-spinner fa-spin"></i> তৈরি হচ্ছে...';
+            msg.style.color = 'var(--text-secondary)';
+
+            try {
+                // ১. ইউজার তৈরি করুন
+                const { data, error } = await supabase.auth.signUp({
+                    email: email,
+                    password: password,
+                    options: {
+                        data: {
+                            full_name: fullName,
+                            role: 'admin'
+                        }
+                    }
+                });
+
+                if (error) {
+                    // যদি ইউজার ইতিমধ্যে থাকে
+                    if (error.message.includes('User already registered')) {
+                        // তাহলে শুধু রোল আপডেট করুন
+                        const { error: updateError } = await supabase
+                            .from('users')
+                            .update({ role: 'admin' })
+                            .eq('email', email);
+                        
+                        if (updateError) {
+                            msg.innerHTML = '❌ আপডেট করতে সমস্যা: ' + updateError.message;
+                            msg.style.color = '#EF4444';
+                            return;
+                        }
+                        
+                        msg.innerHTML = '✅ ইউজার ইতিমধ্যে আছে। অ্যাডমিন রোল সেট করা হয়েছে!';
+                        msg.style.color = '#10B981';
+                    } else {
+                        msg.innerHTML = '❌ ' + error.message;
+                        msg.style.color = '#EF4444';
+                    }
+                    return;
+                }
+
+                msg.innerHTML = '✅ অ্যাডমিন ইউজার তৈরি হয়েছে! <br> এখন লগইন করুন।';
+                msg.style.color = '#10B981';
+
+                setTimeout(() => {
+                    window.location.href = 'login.html';
+                }, 3000);
+
+            } catch (error) {
+                msg.innerHTML = '❌ ' + error.message;
+                msg.style.color = '#EF4444';
+            }
+        });
+    </script>
+</body>
+</html>

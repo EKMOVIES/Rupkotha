@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>কার্ট - রূপকথা</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/dark-theme.css" />
+</head>
+<body>
+    <div class="container" style="padding-top: 120px;">
+        <h2>🛒 আপনার কার্ট</h2>
+        <div id="cartItems">
+            <p style="color: var(--text-secondary);">কার্ট খালি। প্রোডাক্ট যোগ করুন!</p>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script type="module">
+        import { supabase } from './js/config.js';
+        
+        const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+        if (cart.length > 0) {
+            const ids = cart.map(item => item.id);
+            const { data: products } = await supabase
+                .from('products')
+                .select('*')
+                .in('id', ids);
+            
+            let html = '<div class="product-grid">';
+            products.forEach(p => {
+                const qty = cart.find(c => c.id === p.id)?.quantity || 1;
+                html += `
+                    <div class="product-card">
+                        <img src="${p.image_url}" alt="${p.name}" class="product-image" />
+                        <div class="product-info">
+                            <h3>${p.name}</h3>
+                            <p class="product-price">৳${p.price} × ${qty}</p>
+                            <p style="color: var(--primary); font-weight: 600;">মোট: ৳${(p.price * qty).toFixed(2)}</p>
+                        </div>
+                    </div>
+                `;
+            });
+            html += '</div>';
+            document.getElementById('cartItems').innerHTML = html;
+        }
+    </script>
+</body>
+</html>

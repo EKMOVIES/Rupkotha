@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>রূপকথা – Fairy Tale of Beauty</title>
+
+    <!-- Font Awesome 6 (Free) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <!-- Main Stylesheet -->
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/dark-theme.css" />
+    <link rel="stylesheet" href="css/responsive.css" />
+</head>
+<body>
+
+    <!-- ===================== NAVIGATION ===================== -->
+    <nav class="navbar" id="mainNav">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo">
+                <i class="fas fa-spa"></i>
+                <span>রূপকথা</span>
+                <small>Beauty</small>
+            </a>
+
+            <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
+                <i class="fas fa-bars"></i>
+            </button>
+
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="index.html" class="active"><i class="fas fa-home"></i> হোম</a></li>
+                <li><a href="products.html"><i class="fas fa-palette"></i> প্রোডাক্ট</a></li>
+                <li><a href="blog.html"><i class="fas fa-newspaper"></i> ব্লগ</a></li>
+                <li><a href="cart.html" id="cartNav"><i class="fas fa-shopping-bag"></i> কার্ট <span class="cart-badge" id="cartBadge">0</span></a></li>
+                <li class="auth-links" id="authLinks">
+                    <a href="login.html" class="btn-outline-light"><i class="fas fa-sign-in-alt"></i> লগইন</a>
+                    <a href="register.html" class="btn-primary"><i class="fas fa-user-plus"></i> রেজিস্টার</a>
+                </li>
+                <li class="user-menu" id="userMenu" style="display:none;">
+                    <div class="user-dropdown">
+                        <button class="user-btn" id="userBtn">
+                            <img id="userAvatar" src="https://ui-avatars.com/api/?name=User&background=8B5CF6&color=fff&size=32" alt="Avatar" />
+                            <span id="userName">User</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="dropdown-menu" id="dropdownMenu">
+                            <a href="profile.html"><i class="fas fa-user-cog"></i> প্রোফাইল</a>
+                            <a href="orders.html"><i class="fas fa-box"></i> অর্ডার</a>
+                            <a href="admin.html" id="adminLink" style="display:none;"><i class="fas fa-shield-alt"></i> অ্যাডমিন</a>
+                            <hr />
+                            <a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> লগআউট</a>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- ===================== HERO SECTION ===================== -->
+    <section class="hero" id="homeHero">
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <div class="hero-badge">✨ নতুন সংগ্রহ ২০২৬</div>
+            <h1 class="hero-title">
+                <span class="highlight">রূপকথা</span> <br />
+                <span class="sub-text">Fairy Tale of Beauty</span>
+            </h1>
+            <p class="hero-desc">
+                বাংলাদেশের প্রথম প্রিমিয়াম মেকআপ ব্র্যান্ড – যেখানে রূপ আর রঙের মিলনে
+                তৈরি হয় এক অনন্য গল্প।
+            </p>
+            <div class="hero-actions">
+                <a href="products.html" class="btn-hero-primary">
+                    <i class="fas fa-shopping-bag"></i> শপ করুন
+                </a>
+                <a href="#featured" class="btn-hero-secondary">
+                    <i class="fas fa-play-circle"></i> দেখুন
+                </a>
+            </div>
+            <div class="hero-stats">
+                <div class="stat-item">
+                    <span class="stat-number">৫০০+</span>
+                    <span class="stat-label">প্রোডাক্ট</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">১০০০+</span>
+                    <span class="stat-label">সন্তুষ্ট ক্রেতা</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">৯৮%</span>
+                    <span class="stat-label">সন্তুষ্টি স্কোর</span>
+                </div>
+            </div>
+        </div>
+        <div class="hero-scroll">
+            <span>স্ক্রোল করুন</span>
+            <i class="fas fa-chevron-down"></i>
+        </div>
+    </section>
+
+    <!-- ===================== CATEGORIES ===================== -->
+    <section class="categories" id="categories">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">ব্রাউজ</span>
+                <h2>ক্যাটাগরি <span class="highlight">ব্রাউজ</span> করুন</h2>
+                <p>আপনার পছন্দের মেকআপ ক্যাটাগরি খুঁজে নিন</p>
+            </div>
+            <div class="category-grid" id="categoryGrid">
+                <!-- dynamically loaded -->
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================== FEATURED PRODUCTS ===================== -->
+    <section class="featured" id="featured">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">বেস্ট সেলার</span>
+                <h2>ফিচার্ড <span class="highlight">প্রোডাক্ট</span></h2>
+                <p>আমাদের সবচেয়ে জনপ্রিয় মেকআপ আইটেমগুলো</p>
+            </div>
+            <div class="product-grid" id="featuredGrid">
+                <!-- dynamically loaded -->
+            </div>
+            <div class="text-center mt-4">
+                <a href="products.html" class="btn-primary btn-lg">
+                    সব প্রোডাক্ট দেখুন <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================== TESTIMONIALS ===================== -->
+    <section class="testimonials">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">রিভিউ</span>
+                <h2>ক্রেতাদের <span class="highlight">মতামত</span></h2>
+            </div>
+            <div class="testimonial-grid" id="testimonialGrid">
+                <!-- static or dynamic -->
+                <div class="testimonial-card">
+                    <div class="testimonial-stars">★★★★★</div>
+                    <p>"রূপকথার ফাউন্ডেশন আমার ত্বকের জন্য পারফেক্ট! বাংলাদেশের আবহাওয়ায়ও টিকে থাকে সারাদিন।"</p>
+                    <div class="testimonial-author">
+                        <img src="https://ui-avatars.com/api/?name=Tasnim&background=8B5CF6&color=fff" alt="Tasnim" />
+                        <div>
+                            <h4>তাসনিম আক্তার</h4>
+                            <span>ঢাকা</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial-card">
+                    <div class="testimonial-stars">★★★★★</div>
+                    <p>"আই শ্যাডো প্যালেটটা অসাধারণ! রংগুলো খুব ভাইব্রেন্ট আর লম্বা সময় ধরে থাকে।"</p>
+                    <div class="testimonial-author">
+                        <img src="https://ui-avatars.com/api/?name=Rafi&background=8B5CF6&color=fff" alt="Rafi" />
+                        <div>
+                            <h4>রাফি হাসান</h4>
+                            <span>চট্টগ্রাম</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial-card">
+                    <div class="testimonial-stars">★★★★★</div>
+                    <p>"বাংলাদেশের মেয়েদের জন্য রূপকথা সেরা। লিপস্টিকের কালার কালেকশনটা অনন্য!"</p>
+                    <div class="testimonial-author">
+                        <img src="https://ui-avatars.com/api/?name=Nadia&background=8B5CF6&color=fff" alt="Nadia" />
+                        <div>
+                            <h4>নাদিয়া ইসলাম</h4>
+                            <span>রাজশাহী</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================== NEWSLETTER ===================== -->
+    <section class="newsletter">
+        <div class="container">
+            <div class="newsletter-box">
+                <div class="newsletter-icon">
+                    <i class="fas fa-envelope-open-text"></i>
+                </div>
+                <h3>আপডেট থাকুন!</h3>
+                <p>সাবস্ক্রাইব করুন এবং পেতে পারেন এক্সক্লুসিভ অফার, নতুন প্রোডাক্টের খবর ও মেকআপ টিপস।</p>
+                <form class="newsletter-form" id="newsletterForm">
+                    <input type="email" placeholder="আপনার ইমেইল" required />
+                    <button type="submit" class="btn-primary">সাবস্ক্রাইব</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================== FOOTER ===================== -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <a href="index.html" class="nav-logo">
+                        <i class="fas fa-spa"></i>
+                        <span>রূপকথা</span>
+                        <small>Beauty</small>
+                    </a>
+                    <p>বাংলাদেশের প্রথম প্রিমিয়াম মেকআপ ব্র্যান্ড। রূপ আর রঙের মিলনে এক অনন্য গল্প।</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-youtube"></i></a>
+                        <a href="#"><i class="fab fa-tiktok"></i></a>
+                    </div>
+                </div>
+                <div class="footer-links">
+                    <h4>কুইক লিংক</h4>
+                    <ul>
+                        <li><a href="products.html">প্রোডাক্ট</a></li>
+                        <li><a href="blog.html">ব্লগ</a></li>
+                        <li><a href="about.html">আমাদের সম্পর্কে</a></li>
+                        <li><a href="contact.html">যোগাযোগ</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>সাপোর্ট</h4>
+                    <ul>
+                        <li><a href="#">হেল্প সেন্টার</a></li>
+                        <li><a href="#">রিটার্ন পলিসি</a></li>
+                        <li><a href="#">শিপিং</a></li>
+                        <li><a href="#">প্রাইভেসি</a></li>
+                    </ul>
+                </div>
+                <div class="footer-contact">
+                    <h4>যোগাযোগ</h4>
+                    <p><i class="fas fa-map-marker-alt"></i> ঢাকা, বাংলাদেশ</p>
+                    <p><i class="fas fa-phone"></i> +৮৮০ ১৭০০ ০০০০০০</p>
+                    <p><i class="fas fa-envelope"></i> hello@rupkotha.com</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; ২০২৬ <strong>রূপকথা</strong> – সর্বস্বত্ব সংরক্ষিত।</p>
+                <p>বাংলাদেশের জন্য গর্বের সাথে তৈরি 💜</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ===================== TOAST NOTIFICATION ===================== -->
+    <div id="toast" class="toast"></div>
+
+    <!-- ===================== SCRIPTS ===================== -->
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Main App -->
+    <script type="module" src="js/main.js"></script>
+
+</body>
+</html>

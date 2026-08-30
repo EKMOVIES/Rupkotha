@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>লগইন - রূপকথা</title>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.5.1/css/all.css" />
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/dark-theme.css" />
+</head>
+<body>
+    <div class="container" style="padding-top: 150px; max-width: 400px; margin: 0 auto;">
+        <div style="text-align: center; margin-bottom: 30px;">
+            <i class="fas fa-spa" style="font-size: 3rem; color: var(--primary);"></i>
+            <h2 style="margin-top: 10px;">🔐 লগইন করুন</h2>
+        </div>
+        
+        <form id="loginForm">
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; margin-bottom: 8px; font-weight: 500;">ইমেইল</label>
+                <input type="email" id="email" placeholder="your@email.com" required 
+                       style="width: 100%; padding: 14px; background: var(--dark); border: 1px solid var(--dark-border); border-radius: 8px; color: white; font-size: 16px;" />
+            </div>
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; margin-bottom: 8px; font-weight: 500;">পাসওয়ার্ড</label>
+                <input type="password" id="password" placeholder="পাসওয়ার্ড" required 
+                       style="width: 100%; padding: 14px; background: var(--dark); border: 1px solid var(--dark-border); border-radius: 8px; color: white; font-size: 16px;" />
+            </div>
+            <button type="submit" class="btn-primary" style="width: 100%; padding: 14px; font-size: 18px;" id="loginBtn">
+                <i class="fas fa-sign-in-alt"></i> লগইন করুন
+            </button>
+        </form>
+        
+        <div id="errorMessage" style="margin-top: 16px; display: none; padding: 12px; background: rgba(239, 68, 68, 0.1); border-radius: 8px; color: #EF4444; text-align: center;">
+        </div>
+        
+        <p style="text-align: center; margin-top: 20px; color: var(--text-secondary);">
+            অ্যাকাউন্ট নেই? <a href="register.html" style="color: var(--primary); text-decoration: none; font-weight: 600;">রেজিস্টার করুন</a>
+        </p>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script type="module">
+        import { supabase } from './js/config.js';
+        
+        const form = document.getElementById('loginForm');
+        const errorDiv = document.getElementById('errorMessage');
+        const loginBtn = document.getElementById('loginBtn');
+        
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            
+            if (!email || !password) {
+                showError('দয়া করে ইমেইল ও পাসওয়ার্ড দিন');
+                return;
+            }
+            
+            loginBtn.disabled = true;
+            loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> লগইন হচ্ছে...';
+            
+            try {
+                const { data, error } = await supabase.auth.signInWithPassword({
+                    email: email,
+                    password: password
+                });
+                
+                if (error) {
+                    console.error('Login error:', error);
+                    
+                    if (error.message.includes('Invalid login credentials')) {
+                        showError('❌ ইমেইল বা পাসওয়ার্ড ভুল। আবার চেষ্টা করুন।');
+                    } else if (error.message.includes('Email not confirmed')) {
+                        showError('📧 দয়া করে আপনার ইমেইল কনফর্ম করুন।');
+                    } else {
+                        showError('❌ ' + error.message);
+                    }
+                    return;
+                }
+                
+                // লগইন সফল
+                console.log('✅ Login successful:', data.user);
+                
+                const toast = document.getElementById('toast');
+                toast.textContent = '🎉 স্বাগতম! ' + (data.user.user_metadata?.full_name || '');
+                toast.className = 'toast show success';
+                setTimeout(() => toast.classList.remove('show'), 3000);
+                
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 1500);
+                
+            } catch (error) {
+                console.error('Unexpected error:', error);
+                showError('❌ কিছু ভুল হয়েছে। আবার চেষ্টা করুন।');
+            } finally {
+                loginBtn.disabled = false;
+                loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> লগইন করুন';
+            }
+        });
+        
+        function showError(message) {
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            
+            setTimeout(() => {
+                errorDiv.style.display = 'none';
+            }, 5000);
+        }
+    </script>
+</body>
+</html>
