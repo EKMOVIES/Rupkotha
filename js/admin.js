@@ -1,21 +1,22 @@
 // js/admin.js
-import { supabase } from './config.js';
+import { supabase, supabaseAdmin } from './config.js';
 
-// চেক করুন বর্তমান ইউজার অ্যাডমিন কিনা
 export async function isAdmin() {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return false;
-    
-    // ইউজারের মেটাডাটা থেকে রোল চেক করুন
-    return user.user_metadata?.role === 'admin';
+    try {
+        const { data: { user }, error } = await supabase.auth.getUser();
+        if (error || !user) return false;
+        return user.user_metadata?.role === 'admin';
+    } catch (error) {
+        console.error('Error checking admin:', error);
+        return false;
+    }
 }
 
-// প্রোডাক্ট যোগ করার ফাংশন
 export async function addProduct(productData) {
     const admin = await isAdmin();
     if (!admin) throw new Error('অ্যাডমিন অনুমতি প্রয়োজন!');
 
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAdmin
         .from('products')
         .insert([productData])
         .select();
@@ -24,12 +25,11 @@ export async function addProduct(productData) {
     return data[0];
 }
 
-// প্রোডাক্ট আপডেট করার ফাংশন
 export async function updateProduct(id, updates) {
     const admin = await isAdmin();
     if (!admin) throw new Error('অ্যাডমিন অনুমতি প্রয়োজন!');
 
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAdmin
         .from('products')
         .update(updates)
         .eq('id', id)
@@ -39,12 +39,11 @@ export async function updateProduct(id, updates) {
     return data[0];
 }
 
-// প্রোডাক্ট ডিলিট করার ফাংশন
 export async function deleteProduct(id) {
     const admin = await isAdmin();
     if (!admin) throw new Error('অ্যাডমিন অনুমতি প্রয়োজন!');
 
-    const { error } = await supabase
+    const { error } = await supabaseAdmin
         .from('products')
         .delete()
         .eq('id', id);
