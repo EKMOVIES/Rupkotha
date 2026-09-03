@@ -1,10 +1,11 @@
 {
-  "name": "rupkotha-beauty",
+  "name": "Rupkotha",
   "version": "1.0.0",
+  "description": "রূপকথা - Fairy Tale of Beauty",
   "scripts": {
-    "start": "live-server --port=10000 --host=0.0.0.0"
+    "start": "node server.js"
   },
   "dependencies": {
-    "live-server": "^1.2.2"
+    "express": "^4.18.2"
   }
 }
