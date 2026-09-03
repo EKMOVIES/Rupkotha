@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>হিরো কার্ড - রূপকথা</title>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.5.1/css/all.css" />
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/dark-theme.css" />
+    <link rel="stylesheet" href="css/responsive.css" />
+    <style>
+        .card-item {
+            background: var(--dark-card);
+            border: 1px solid var(--dark-border);
+            border-radius: var(--radius);
+            padding: 20px;
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        .card-item .info { flex: 1; }
+        .card-item .info h4 { margin-bottom: 4px; }
+        .card-item .info p { color: var(--text-secondary); font-size: 13px; }
+        .card-item .actions { display: flex; gap: 8px; }
+        .card-item .actions button { padding: 6px 14px; border-radius: 6px; border: none; cursor: pointer; font-size: 13px; }
+        .btn-edit { background: var(--primary); color: white; }
+        .btn-delete { background: transparent; color: #EF4444; border: 1px solid #EF4444; }
+        .btn-delete:hover { background: #EF4444; color: white; }
+        .status-badge.active { background: rgba(16, 185, 129, 0.2); color: #10B981; }
+        .status-badge.inactive { background: rgba(239, 68, 68, 0.2); color: #EF4444; }
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-content {
+            background: var(--dark-card);
+            border-radius: var(--radius);
+            padding: 30px;
+            max-width: 550px;
+            width: 90%;
+            border: 1px solid var(--dark-border);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .modal-content .form-group { margin-bottom: 16px; }
+        .modal-content .form-group label { display: block; margin-bottom: 6px; font-weight: 500; }
+        .modal-content .form-group input, .modal-content .form-group textarea, .modal-content .form-group select {
+            width: 100%;
+            padding: 10px 14px;
+            background: var(--dark);
+            border: 1px solid var(--dark-border);
+            border-radius: 8px;
+            color: white;
+            font-size: 14px;
+        }
+        .modal-actions { display: flex; gap: 12px; margin-top: 16px; }
+        .modal-actions button { flex: 1; padding: 10px; border-radius: 8px; border: none; cursor: pointer; font-size: 16px; font-weight: 600; }
+        .btn-save { background: var(--primary); color: white; }
+        .btn-cancel { background: transparent; border: 1px solid var(--dark-border); color: var(--text-secondary); }
+    </style>
+</head>
+<body>
+    <!-- ===== NAVIGATION ===== -->
+    <nav class="navbar" id="mainNav">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo"><i class="fas fa-spa"></i><span>রূপকথা</span><small>Beauty</small></a>
+            <button class="nav-toggle" id="navToggle"><i class="fas fa-bars"></i></button>
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="index.html">হোম</a></li>
+                <li><a href="products.html">প্রোডাক্ট</a></li>
+                <li><a href="cart.html">কার্ট <span class="cart-badge" id="cartBadge">0</span></a></li>
+                <li class="auth-links" id="authLinks">
+                    <a href="login.html" class="btn-outline-light">লগইন</a>
+                    <a href="register.html" class="btn-primary">রেজিস্টার</a>
+                </li>
+                <li class="user-menu" id="userMenu" style="display:none;">
+                    <div class="user-dropdown">
+                        <button class="user-btn" id="userBtn">
+                            <img id="userAvatar" src="https://ui-avatars.com/api/?name=User&background=8B5CF6&color=fff&size=32" alt="Avatar" />
+                            <span id="userName">User</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="dropdown-menu" id="dropdownMenu">
+                            <a href="admin-dashboard.html">📊 ড্যাশবোর্ড</a>
+                            <a href="admin-add-product.html">📦 প্রোডাক্ট যোগ</a>
+                            <a href="admin-manage-products.html">📋 প্রোডাক্ট লিস্ট</a>
+                            <a href="admin-categories.html">📂 ক্যাটাগরি</a>
+                            <a href="admin-orders.html">📋 অর্ডার</a>
+                            <a href="admin-users.html">👥 ইউজার</a>
+                            <a href="admin-sliders.html">🖼️ স্লাইডার</a>
+                            <a href="admin-banners.html">🏳️ ব্যানার</a>
+                            <a href="admin-offers.html">🏷️ অফার</a>
+                            <a href="admin-hero-cards.html">🃏 হিরো কার্ড</a>
+                            <hr />
+                            <a href="#" id="logoutBtn">লগআউট</a>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <section style="padding-top: 120px; padding-bottom: 60px;">
+        <div class="container">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;margin-bottom:30px;">
+                <div>
+                    <span class="section-tag">অ্যাডমিন</span>
+                    <h2 style="font-family:'Playfair Display',serif;font-size:2.5rem;">🃏 হিরো কার্ড</h2>
+                    <p style="color:var(--text-secondary);">হোমপেজের স্পেশাল কার্ড যোগ, এডিট ও ডিলিট করুন</p>
+                </div>
+                <button onclick="window.openAddModal()" class="btn-primary"><i class="fas fa-plus"></i> নতুন কার্ড</button>
+            </div>
+
+            <div id="loadingSpinner" style="text-align:center;padding:40px 0;">
+                <i class="fas fa-spinner fa-spin" style="font-size:2rem;color:var(--primary);"></i>
+                <p style="color:var(--text-secondary);margin-top:12px;">কার্ড লোড হচ্ছে...</p>
+            </div>
+            <div id="cardsList"></div>
+            <div id="noCards" style="display:none;text-align:center;padding:40px;color:var(--text-secondary);">
+                <i class="fas fa-id-card" style="font-size:3rem;display:block;margin-bottom:12px;"></i>
+                <p>কোনো কার্ড নেই</p>
+                <button onclick="window.openAddModal()" class="btn-primary" style="margin-top:12px;"><i class="fas fa-plus"></i> প্রথম কার্ড যোগ করুন</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== MODAL ===== -->
+    <div id="cardModal" class="modal">
+        <div class="modal-content">
+            <h3 id="modalTitle" style="margin-bottom:20px;">📝 নতুন কার্ড</h3>
+            <form id="cardForm">
+                <input type="hidden" id="cardId" />
+                <div class="form-group"><label>শিরোনাম *</label><input type="text" id="cardTitle" required /></div>
+                <div class="form-group"><label>উপশিরোনাম</label><input type="text" id="cardSubtitle" /></div>
+                <div class="form-group"><label>বিবরণ</label><textarea id="cardDescription" rows="2"></textarea></div>
+                <div class="form-group"><label>ব্যাজ টেক্সট</label><input type="text" id="cardBadge" placeholder="🔥 স্পেশাল অফার" /></div>
+                <div class="form-group">
+                    <label>ব্যাজ কালার</label>
+                    <select id="cardBadgeColor"><option value="primary">পার্পল</option><option value="red">লাল</option></select>
+                </div>
+                <div class="form-group"><label>বাটনের টেক্সট</label><input type="text" id="cardButtonText" placeholder="শপ করুন" /></div>
+                <div class="form-group"><label>বাটনের লিংক</label><input type="text" id="cardButtonLink" placeholder="products.html" /></div>
+                <div class="form-group"><label>অর্ডার</label><input type="number" id="cardOrder" value="0" /></div>
+                <div class="form-group"><label>স্ট্যাটাস</label><select id="cardStatus"><option value="true">সক্রিয়</option><option value="false">নিষ্ক্রিয়</option></select></div>
+                <div class="modal-actions">
+                    <button type="submit" class="btn-save"><i class="fas fa-save"></i> সংরক্ষণ</button>
+                    <button type="button" class="btn-cancel" onclick="window.closeModal()">বাতিল</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script type="module">
+        import { supabase } from './js/config.js';
+        import { checkAuth, updateAuthUI, setupDropdown, setupLogout } from './js/auth.js';
+        import { updateCartBadge } from './js/products.js';
+        import { isAdmin } from './js/admin.js';
+        import { addHeroCard, updateHeroCard, deleteHeroCard } from './js/home.js';
+
+        // =============================================
+        // 1. GLOBAL FUNCTIONS (টপ-লেভেলে)
+        // =============================================
+        window.openAddModal = function() {
+            document.getElementById('modalTitle').textContent = '📝 নতুন কার্ড';
+            document.getElementById('cardForm').reset();
+            document.getElementById('cardId').value = '';
+            document.getElementById('cardStatus').value = 'true';
+            document.getElementById('cardBadgeColor').value = 'primary';
+            document.getElementById('cardModal').style.display = 'flex';
+        };
+
+        window.closeModal = function() {
+            document.getElementById('cardModal').style.display = 'none';
+        };
+
+        window.showToast = function(message, type = 'info') {
+            const toast = document.getElementById('toast');
+            if (!toast) return;
+            toast.textContent = message;
+            toast.className = `toast show ${type}`;
+            if (window.toastTimeout) clearTimeout(window.toastTimeout);
+            window.toastTimeout = setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        };
+
+        // =============================================
+        // 2. INIT
+        // =============================================
+        const user = await checkAuth();
+        updateAuthUI(user);
+        updateCartBadge();
+        setupDropdown();
+        setupLogout();
+
+        const admin = await isAdmin();
+        if (!admin) {
+            document.querySelector('section').innerHTML = `
+                <div style="text-align:center;padding:60px 0;">
+                    <i class="fas fa-shield-alt" style="font-size:3rem;color:#EF4444;display:block;margin-bottom:16px;"></i>
+                    <h2 style="color:#EF4444;">⛔ অ্যাক্সেস অস্বীকৃত</h2>
+                    <p style="color:var(--text-secondary);">শুধুমাত্র অ্যাডমিন ইউজার এই পেজ দেখতে পারেন।</p>
+                    <a href="index.html" class="btn-primary" style="display:inline-block;margin-top:16px;">
+                        <i class="fas fa-home"></i> হোমপেজে যান
+                    </a>
+                </div>
+            `;
+        } else {
+            loadCards();
+        }
+
+        // =============================================
+        // 3. LOAD CARDS
+        // =============================================
+        async function loadCards() {
+            const container = document.getElementById('cardsList');
+            const spinner = document.getElementById('loadingSpinner');
+            const noCards = document.getElementById('noCards');
+
+            try {
+                const { data, error } = await supabase
+                    .from('hero_cards')
+                    .select('*')
+                    .order('order_number', { ascending: true });
+
+                if (error) throw error;
+
+                spinner.style.display = 'none';
+
+                if (!data || data.length === 0) {
+                    noCards.style.display = 'block';
+                    return;
+                }
+
+                noCards.style.display = 'none';
+
+                container.innerHTML = data.map(card => `
+                    <div class="card-item">
+                        <div class="info">
+                            <h4>${card.title}</h4>
+                            <p>${card.subtitle || ''} ${card.badge_text ? `🏷️ ${card.badge_text}` : ''}</p>
+                            <p style="font-size:12px;color:var(--text-secondary);">
+                                <span class="status-badge ${card.is_active ? 'active' : 'inactive'}">${card.is_active ? '✅ সক্রিয়' : '❌ নিষ্ক্রিয়'}</span>
+                                ${card.button_text ? `🔗 ${card.button_text}` : ''}
+                            </p>
+                        </div>
+                        <div class="actions">
+                            <button class="btn-edit" onclick="window.editCard('${card.id}')"><i class="fas fa-edit"></i></button>
+                            <button class="btn-delete" onclick="window.deleteCardItem('${card.id}')"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>
+                `).join('');
+
+                // =============================================
+                // 4. GLOBAL EDIT & DELETE FUNCTIONS
+                // =============================================
+                window.editCard = async function(id) {
+                    try {
+                        const { data, error } = await supabase
+                            .from('hero_cards')
+                            .select('*')
+                            .eq('id', id)
+                            .single();
+
+                        if (error) throw error;
+
+                        document.getElementById('modalTitle').textContent = '✏️ কার্ড এডিট';
+                        document.getElementById('cardId').value = data.id;
+                        document.getElementById('cardTitle').value = data.title;
+                        document.getElementById('cardSubtitle').value = data.subtitle || '';
+                        document.getElementById('cardDescription').value = data.description || '';
+                        document.getElementById('cardBadge').value = data.badge_text || '';
+                        document.getElementById('cardBadgeColor').value = data.badge_color || 'primary';
+                        document.getElementById('cardButtonText').value = data.button_text || '';
+                        document.getElementById('cardButtonLink').value = data.button_link || '';
+                        document.getElementById('cardOrder').value = data.order_number || 0;
+                        document.getElementById('cardStatus').value = data.is_active ? 'true' : 'false';
+                        document.getElementById('cardModal').style.display = 'flex';
+                    } catch (error) {
+                        window.showToast('কার্ড লোড করতে ব্যর্থ!', 'error');
+                    }
+                };
+
+                window.deleteCardItem = async function(id) {
+                    if (!confirm('আপনি কি এই কার্ড ডিলিট করতে চান?')) return;
+                    try {
+                        await deleteHeroCard(id);
+                        window.showToast('✅ কার্ড ডিলিট করা হয়েছে!', 'success');
+                        loadCards();
+                    } catch (error) {
+                        window.showToast('❌ ' + error.message, 'error');
+                    }
+                };
+
+            } catch (error) {
+                console.error('Error loading cards:', error);
+                spinner.style.display = 'none';
+                container.innerHTML = `<p style="color:#EF4444;">কার্ড লোড করতে ব্যর্থ!</p>`;
+            }
+        }
+
+        // =============================================
+        // 5. FORM SUBMIT
+        // =============================================
+        document.getElementById('cardForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const id = document.getElementById('cardId').value;
+            const data = {
+                title: document.getElementById('cardTitle').value.trim(),
+                subtitle: document.getElementById('cardSubtitle').value.trim(),
+                description: document.getElementById('cardDescription').value.trim(),
+                badge_text: document.getElementById('cardBadge').value.trim(),
+                badge_color: document.getElementById('cardBadgeColor').value,
+                button_text: document.getElementById('cardButtonText').value.trim(),
+                button_link: document.getElementById('cardButtonLink').value.trim(),
+                order_number: parseInt(document.getElementById('cardOrder').value) || 0,
+                is_active: document.getElementById('cardStatus').value === 'true'
+            };
+
+            if (!data.title) {
+                window.showToast('দয়া করে শিরোনাম দিন!', 'error');
+                return;
+            }
+
+            try {
+                if (id) {
+                    await updateHeroCard(id, data);
+                    window.showToast('✅ কার্ড আপডেট করা হয়েছে!', 'success');
+                } else {
+                    await addHeroCard(data);
+                    window.showToast('✅ নতুন কার্ড যোগ করা হয়েছে!', 'success');
+                }
+                window.closeModal();
+                loadCards();
+            } catch (error) {
+                window.showToast('❌ ' + error.message, 'error');
+            }
+        });
+
+        // =============================================
+        // 6. MAKE FUNCTIONS GLOBALLY AVAILABLE (আবারও নিশ্চিত)
+        // =============================================
+        window.openAddModal = window.openAddModal;
+        window.closeModal = window.closeModal;
+        window.editCard = window.editCard;
+        window.deleteCardItem = window.deleteCardItem;
+        window.showToast = window.showToast;
+    </script>
+</body>
+</html>

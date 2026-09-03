@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>অফার ম্যানেজ - রূপকথা</title>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.5.1/css/all.css" />
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/dark-theme.css" />
+    <link rel="stylesheet" href="css/responsive.css" />
+    <style>
+        .offer-card {
+            background: var(--dark-card);
+            border: 1px solid var(--dark-border);
+            border-radius: var(--radius);
+            padding: 20px;
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            margin-bottom: 16px;
+            transition: var(--transition);
+        }
+        .offer-card:hover { border-color: var(--primary); }
+        .offer-card img { width: 100px; height: 80px; object-fit: cover; border-radius: 8px; }
+        .offer-card .info { flex: 1; }
+        .offer-card .info h4 { margin-bottom: 4px; }
+        .offer-card .info p { color: var(--text-secondary); font-size: 13px; }
+        .offer-card .discount-badge {
+            background: linear-gradient(135deg, #EF4444, #DC2626);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .offer-card .actions { display: flex; gap: 8px; }
+        .offer-card .actions button { padding: 6px 14px; border-radius: 6px; border: none; cursor: pointer; font-size: 13px; transition: var(--transition); }
+        .btn-edit-offer { background: var(--primary); color: white; }
+        .btn-edit-offer:hover { background: var(--primary-dark); }
+        .btn-delete-offer { background: transparent; color: #EF4444; border: 1px solid #EF4444; }
+        .btn-delete-offer:hover { background: #EF4444; color: white; }
+        .status-badge.active { background: rgba(16, 185, 129, 0.2); color: #10B981; }
+        .status-badge.inactive { background: rgba(239, 68, 68, 0.2); color: #EF4444; }
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-content {
+            background: var(--dark-card);
+            border-radius: var(--radius);
+            padding: 30px;
+            max-width: 550px;
+            width: 90%;
+            border: 1px solid var(--dark-border);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .modal-content .form-group { margin-bottom: 16px; }
+        .modal-content .form-group label { display: block; margin-bottom: 6px; font-weight: 500; }
+        .modal-content .form-group input,
+        .modal-content .form-group textarea,
+        .modal-content .form-group select {
+            width: 100%;
+            padding: 10px 14px;
+            background: var(--dark);
+            border: 1px solid var(--dark-border);
+            border-radius: 8px;
+            color: white;
+            font-size: 14px;
+        }
+        .modal-content .form-group input:focus,
+        .modal-content .form-group textarea:focus { border-color: var(--primary); outline: none; }
+        .modal-actions { display: flex; gap: 12px; margin-top: 16px; }
+        .modal-actions button { flex: 1; padding: 10px; border-radius: 8px; border: none; cursor: pointer; font-size: 16px; font-weight: 600; }
+        .btn-save { background: var(--primary); color: white; }
+        .btn-save:hover { background: var(--primary-dark); }
+        .btn-cancel { background: transparent; border: 1px solid var(--dark-border); color: var(--text-secondary); }
+        .btn-cancel:hover { border-color: #EF4444; color: #EF4444; }
+        .upload-preview { 
+            margin-top: 10px; 
+            padding: 10px; 
+            background: var(--dark); 
+            border-radius: 8px; 
+            border: 1px solid var(--dark-border);
+            display: none;
+        }
+        .upload-preview img { max-width: 150px; max-height: 150px; border-radius: 4px; }
+        .upload-preview .url-display { 
+            font-size: 12px; 
+            color: var(--text-secondary); 
+            word-break: break-all;
+            margin-top: 6px;
+        }
+    </style>
+</head>
+<body>
+    <!-- ===== NAVIGATION ===== -->
+    <nav class="navbar" id="mainNav">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo">
+                <i class="fas fa-spa"></i>
+                <span>রূপকথা</span>
+                <small>Beauty</small>
+            </a>
+            <button class="nav-toggle" id="navToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="index.html">হোম</a></li>
+                <li><a href="products.html">প্রোডাক্ট</a></li>
+                <li><a href="cart.html">কার্ট <span class="cart-badge" id="cartBadge">0</span></a></li>
+                <li class="auth-links" id="authLinks">
+                    <a href="login.html" class="btn-outline-light">লগইন</a>
+                    <a href="register.html" class="btn-primary">রেজিস্টার</a>
+                </li>
+                <li class="user-menu" id="userMenu" style="display:none;">
+                    <div class="user-dropdown">
+                        <button class="user-btn" id="userBtn">
+                            <img id="userAvatar" src="https://ui-avatars.com/api/?name=User&background=8B5CF6&color=fff&size=32" alt="Avatar" />
+                            <span id="userName">User</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="dropdown-menu" id="dropdownMenu">
+                            <a href="admin-dashboard.html">📊 ড্যাশবোর্ড</a>
+                            <a href="admin-add-product.html">📦 প্রোডাক্ট যোগ</a>
+                            <a href="admin-manage-products.html">📋 প্রোডাক্ট লিস্ট</a>
+                            <a href="admin-categories.html">📂 ক্যাটাগরি</a>
+                            <a href="admin-orders.html">📋 অর্ডার</a>
+                            <a href="admin-users.html">👥 ইউজার</a>
+                            <a href="admin-sliders.html">🖼️ স্লাইডার</a>
+                            <a href="admin-banners.html">🏳️ ব্যানার</a>
+                            <a href="admin-offers.html">🏷️ অফার</a>
+                            <hr />
+                            <a href="#" id="logoutBtn">লগআউট</a>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <section style="padding-top: 120px; padding-bottom: 60px;">
+        <div class="container">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 30px;">
+                <div>
+                    <span class="section-tag">অ্যাডমিন</span>
+                    <h2 style="font-family: 'Playfair Display', serif; font-size: 2.5rem;">🏷️ অফার ম্যানেজ</h2>
+                    <p style="color: var(--text-secondary);">হোমপেজের অফার যোগ, এডিট ও ডিলিট করুন</p>
+                </div>
+                <button onclick="openAddOfferModal()" class="btn-primary">
+                    <i class="fas fa-plus"></i> নতুন অফার
+                </button>
+            </div>
+
+            <div id="loadingSpinner" style="text-align: center; padding: 40px 0;">
+                <i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: var(--primary);"></i>
+                <p style="color: var(--text-secondary); margin-top: 12px;">অফার লোড হচ্ছে...</p>
+            </div>
+
+            <div id="offersList"></div>
+            <div id="noOffers" style="display: none; text-align: center; padding: 40px; color: var(--text-secondary);">
+                <i class="fas fa-tags" style="font-size: 3rem; display: block; margin-bottom: 12px;"></i>
+                <p>কোনো অফার নেই</p>
+                <button onclick="openAddOfferModal()" class="btn-primary" style="margin-top: 12px;">
+                    <i class="fas fa-plus"></i> প্রথম অফার যোগ করুন
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== MODAL ===== -->
+    <div id="offerModal" class="modal">
+        <div class="modal-content">
+            <h3 id="offerModalTitle" style="margin-bottom: 20px;">📝 নতুন অফার</h3>
+            <form id="offerForm">
+                <input type="hidden" id="offerId" />
+                <div class="form-group">
+                    <label>শিরোনাম *</label>
+                    <input type="text" id="offerTitle" required />
+                </div>
+                <div class="form-group">
+                    <label>বিবরণ</label>
+                    <textarea id="offerDescription" rows="2"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>ডিসকাউন্ট (%) *</label>
+                    <input type="number" id="offerDiscount" required min="0" max="100" />
+                </div>
+                
+                <!-- ✅ ইমেজ আপলোড সেকশন -->
+                <div class="form-group">
+                    <label>ইমেজ আপলোড করুন</label>
+                    <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+                        <input type="file" id="offerImageFile" accept="image/*" style="flex:1; padding: 10px; background: var(--dark); border: 1px solid var(--dark-border); border-radius: 8px; color: white;" />
+                        <button type="button" onclick="uploadOfferImage()" class="btn-primary" style="padding: 10px 20px; white-space: nowrap;">
+                            <i class="fas fa-cloud-upload-alt"></i> আপলোড
+                        </button>
+                    </div>
+                    <div id="offerImagePreview" class="upload-preview"></div>
+                    <input type="hidden" id="offerImage" />
+                    <small style="color: var(--text-secondary);">ইমেজ আপলোড করলে URL স্বয়ংক্রিয়ভাবে বসবে</small>
+                </div>
+
+                <div class="form-group">
+                    <label>মেয়াদ শেষের তারিখ</label>
+                    <input type="datetime-local" id="offerExpires" />
+                </div>
+                <div class="form-group">
+                    <label>স্ট্যাটাস</label>
+                    <select id="offerStatus">
+                        <option value="true">সক্রিয়</option>
+                        <option value="false">নিষ্ক্রিয়</option>
+                    </select>
+                </div>
+                <div class="modal-actions">
+                    <button type="submit" class="btn-save"><i class="fas fa-save"></i> সংরক্ষণ</button>
+                    <button type="button" class="btn-cancel" onclick="closeOfferModal()">বাতিল</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script type="module">
+        import { supabase } from './js/config.js';
+        import { checkAuth, updateAuthUI, setupDropdown, setupLogout } from './js/auth.js';
+        import { updateCartBadge } from './js/products.js';
+        import { isAdmin } from './js/admin.js';
+        import { addOffer, updateOffer, deleteOffer } from './js/home.js';
+        import { uploadImageToCloudinary } from './js/upload.js';
+
+        // ===== INIT =====
+        const user = await checkAuth();
+        updateAuthUI(user);
+        updateCartBadge();
+        setupDropdown();
+        setupLogout();
+
+        const admin = await isAdmin();
+        if (!admin) {
+            document.querySelector('section').innerHTML = `
+                <div style="text-align:center;padding:60px 0;">
+                    <i class="fas fa-shield-alt" style="font-size:3rem;color:#EF4444;display:block;margin-bottom:16px;"></i>
+                    <h2 style="color:#EF4444;">⛔ অ্যাক্সেস অস্বীকৃত</h2>
+                    <p style="color:var(--text-secondary);">শুধুমাত্র অ্যাডমিন ইউজার এই পেজ দেখতে পারেন।</p>
+                    <a href="index.html" class="btn-primary" style="display:inline-block;margin-top:16px;">
+                        <i class="fas fa-home"></i> হোমপেজে যান
+                    </a>
+                </div>
+            `;
+        } else {
+            loadOffers();
+        }
+
+        // ===== GLOBAL FUNCTIONS =====
+        window.openAddOfferModal = function() {
+            document.getElementById('offerModalTitle').textContent = '📝 নতুন অফার';
+            document.getElementById('offerForm').reset();
+            document.getElementById('offerId').value = '';
+            document.getElementById('offerStatus').value = 'true';
+            document.getElementById('offerImagePreview').style.display = 'none';
+            document.getElementById('offerModal').style.display = 'flex';
+        };
+
+        window.closeOfferModal = function() {
+            document.getElementById('offerModal').style.display = 'none';
+        };
+
+        // ✅ ইমেজ আপলোড ফাংশন
+        window.uploadOfferImage = async function() {
+            const fileInput = document.getElementById('offerImageFile');
+            const file = fileInput.files[0];
+            if (!file) {
+                showToast('দয়া করে একটি ইমেজ নির্বাচন করুন!', 'error');
+                return;
+            }
+
+            try {
+                showToast('⏳ ইমেজ আপলোড হচ্ছে...', 'info');
+                const result = await uploadImageToCloudinary(file);
+                
+                document.getElementById('offerImage').value = result.url;
+                
+                const preview = document.getElementById('offerImagePreview');
+                preview.style.display = 'block';
+                preview.innerHTML = `
+                    <img src="${result.url}" alt="Preview" />
+                    <div class="url-display">📎 ${result.url}</div>
+                `;
+                
+                showToast('✅ ইমেজ আপলোড সফল!', 'success');
+            } catch (error) {
+                console.error('Upload error:', error);
+                showToast('❌ ইমেজ আপলোড ব্যর্থ: ' + error.message, 'error');
+            }
+        };
+
+        window.editOffer = async function(id) {
+            try {
+                const { data, error } = await supabase
+                    .from('offers')
+                    .select('*')
+                    .eq('id', id)
+                    .single();
+
+                if (error) throw error;
+
+                document.getElementById('offerModalTitle').textContent = '✏️ অফার এডিট';
+                document.getElementById('offerId').value = data.id;
+                document.getElementById('offerTitle').value = data.title;
+                document.getElementById('offerDescription').value = data.description || '';
+                document.getElementById('offerDiscount').value = data.discount_percent || 0;
+                document.getElementById('offerImage').value = data.image_url || '';
+                if (data.expires_at) {
+                    const date = new Date(data.expires_at);
+                    document.getElementById('offerExpires').value = date.toISOString().slice(0, 16);
+                }
+                document.getElementById('offerStatus').value = data.is_active ? 'true' : 'false';
+                
+                if (data.image_url) {
+                    const preview = document.getElementById('offerImagePreview');
+                    preview.style.display = 'block';
+                    preview.innerHTML = `
+                        <img src="${data.image_url}" alt="Preview" />
+                        <div class="url-display">📎 ${data.image_url}</div>
+                    `;
+                }
+                
+                document.getElementById('offerModal').style.display = 'flex';
+            } catch (error) {
+                showToast('অফার লোড করতে ব্যর্থ!', 'error');
+            }
+        };
+
+        window.deleteOfferItem = async function(id) {
+            if (!confirm('আপনি কি এই অফার ডিলিট করতে চান?')) return;
+            try {
+                await deleteOffer(id);
+                showToast('✅ অফার ডিলিট করা হয়েছে!', 'success');
+                loadOffers();
+            } catch (error) {
+                showToast('❌ ' + error.message, 'error');
+            }
+        };
+
+        // ===== LOAD OFFERS =====
+        async function loadOffers() {
+            const container = document.getElementById('offersList');
+            const spinner = document.getElementById('loadingSpinner');
+            const noOffers = document.getElementById('noOffers');
+
+            try {
+                const { data, error } = await supabase
+                    .from('offers')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+
+                if (error) throw error;
+
+                spinner.style.display = 'none';
+
+                if (!data || data.length === 0) {
+                    noOffers.style.display = 'block';
+                    return;
+                }
+
+                noOffers.style.display = 'none';
+                container.innerHTML = data.map(offer => `
+                    <div class="offer-card">
+                        ${offer.image_url ? `<img src="${offer.image_url}" alt="${offer.title}" onerror="this.style.display='none'" />` : `<div style="width:100px;height:80px;background:var(--dark);border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--text-secondary);"><i class="fas fa-tag" style="font-size:2rem;"></i></div>`}
+                        <div class="info">
+                            <h4>${offer.title}</h4>
+                            <p>${offer.description || ''}</p>
+                            <p style="font-size:12px;color:var(--text-secondary);">
+                                <span class="discount-badge">${offer.discount_percent}% অফ!</span>
+                                <span class="status-badge ${offer.is_active ? 'active' : 'inactive'}">${offer.is_active ? '✅ সক্রিয়' : '❌ নিষ্ক্রিয়'}</span>
+                                ${offer.expires_at ? `⏳ ${new Date(offer.expires_at).toLocaleDateString('bn-BD')}` : ''}
+                            </p>
+                        </div>
+                        <div class="actions">
+                            <button class="btn-edit-offer" onclick="editOffer('${offer.id}')"><i class="fas fa-edit"></i></button>
+                            <button class="btn-delete-offer" onclick="deleteOfferItem('${offer.id}')"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>
+                `).join('');
+
+            } catch (error) {
+                console.error('Error loading offers:', error);
+                spinner.style.display = 'none';
+                container.innerHTML = `<p style="color:#EF4444;">অফার লোড করতে ব্যর্থ!</p>`;
+            }
+        }
+
+        // ===== FORM SUBMIT =====
+        document.getElementById('offerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('offerId').value;
+            const imageUrl = document.getElementById('offerImage').value.trim();
+            
+            const data = {
+                title: document.getElementById('offerTitle').value.trim(),
+                description: document.getElementById('offerDescription').value.trim(),
+                discount_percent: parseInt(document.getElementById('offerDiscount').value) || 0,
+                image_url: imageUrl || '',
+                expires_at: document.getElementById('offerExpires').value || null,
+                is_active: document.getElementById('offerStatus').value === 'true'
+            };
+
+            if (!data.title) {
+                showToast('দয়া করে শিরোনাম দিন!', 'error');
+                return;
+            }
+
+            if (!data.discount_percent || data.discount_percent < 0 || data.discount_percent > 100) {
+                showToast('সঠিক ডিসকাউন্ট দিন (০-১০০)!', 'error');
+                return;
+            }
+
+            try {
+                if (id) {
+                    await updateOffer(id, data);
+                    showToast('✅ অফার আপডেট করা হয়েছে!', 'success');
+                } else {
+                    await addOffer(data);
+                    showToast('✅ নতুন অফার যোগ করা হয়েছে!', 'success');
+                }
+                closeOfferModal();
+                loadOffers();
+            } catch (error) {
+                showToast('❌ ' + error.message, 'error');
+            }
+        });
+
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast show ${type}`;
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+    </script>
+</body>
+</html>

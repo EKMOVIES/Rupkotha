@@ -1,12 +1,129 @@
+// js/auth.js
+
 import { supabase } from './config.js';
 
-// Check if user is logged in
+// =============================================
+// 1. CHECK AUTH
+// =============================================
 export async function checkAuth() {
-    const { data: { user } } = await supabase.auth.getUser();
-    return user;
+    try {
+        const { data: { user } } = await supabase.auth.getUser();
+        return user;
+    } catch (error) {
+        console.error('Auth check error:', error);
+        return null;
+    }
 }
 
-// Login function
+// =============================================
+// 2. UPDATE UI
+// =============================================
+export function updateAuthUI(user) {
+    const authLinks = document.getElementById('authLinks');
+    const userMenu = document.getElementById('userMenu');
+    const userName = document.getElementById('userName');
+    const userAvatar = document.getElementById('userAvatar');
+    const adminLink = document.getElementById('adminLink');
+
+    if (user) {
+        if (authLinks) authLinks.style.display = 'none';
+        if (userMenu) userMenu.style.display = 'block';
+        
+        if (userName) {
+            userName.textContent = user.user_metadata?.full_name || 'User';
+        }
+        if (userAvatar) {
+            userAvatar.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.user_metadata?.full_name || 'User')}&background=8B5CF6&color=fff&size=32`;
+        }
+        
+        if (adminLink) {
+            adminLink.style.display = user.user_metadata?.role === 'admin' ? 'block' : 'none';
+        }
+    } else {
+        if (authLinks) authLinks.style.display = 'flex';
+        if (userMenu) userMenu.style.display = 'none';
+    }
+}
+
+// =============================================
+// 3. SETUP DROPDOWN
+// =============================================
+export function setupDropdown() {
+    const userBtn = document.getElementById('userBtn');
+    const dropdownMenu = document.getElementById('dropdownMenu');
+    
+    if (userBtn && dropdownMenu) {
+        const newUserBtn = userBtn.cloneNode(true);
+        userBtn.parentNode.replaceChild(newUserBtn, userBtn);
+        
+        newUserBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            dropdownMenu.classList.toggle('show');
+        });
+        
+        document.addEventListener('click', () => {
+            dropdownMenu.classList.remove('show');
+        });
+        
+        dropdownMenu.addEventListener('click', (e) => {
+            e.stopPropagation();
+        });
+    }
+}
+
+// =============================================
+// 4. SETUP LOGOUT (✅ এখানে ফাংশনটি আছে)
+// =============================================
+export function setupLogout() {
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) {
+        const newLogoutBtn = logoutBtn.cloneNode(true);
+        logoutBtn.parentNode.replaceChild(newLogoutBtn, logoutBtn);
+        
+        newLogoutBtn.addEventListener('click', async (e) => {
+            e.preventDefault();
+            try {
+                await supabase.auth.signOut();
+                showToast('✅ লগআউট সফল!', 'success');
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 500);
+            } catch (error) {
+                console.error('Logout error:', error);
+                showToast('❌ লগআউট করতে ব্যর্থ!', 'error');
+            }
+        });
+    }
+}
+
+// =============================================
+// 5. SETUP ADMIN LOGOUT (অ্যাডমিন পেজের জন্য)
+// =============================================
+export function setupAdminLogout() {
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) {
+        const newLogoutBtn = logoutBtn.cloneNode(true);
+        logoutBtn.parentNode.replaceChild(newLogoutBtn, logoutBtn);
+        
+        newLogoutBtn.addEventListener('click', async (e) => {
+            e.preventDefault();
+            try {
+                await supabase.auth.signOut();
+                showToast('✅ লগআউট সফল!', 'success');
+                setTimeout(() => {
+                    window.location.href = 'admin-login.html';
+                }, 500);
+            } catch (error) {
+                console.error('Logout error:', error);
+                showToast('❌ লগআউট করতে ব্যর্থ!', 'error');
+            }
+        });
+    }
+}
+
+// =============================================
+// 6. LOGIN FUNCTION
+// =============================================
 export async function loginUser(email, password) {
     const { data, error } = await supabase.auth.signInWithPassword({
         email,
@@ -16,7 +133,9 @@ export async function loginUser(email, password) {
     return data;
 }
 
-// Register function
+// =============================================
+// 7. REGISTER FUNCTION
+// =============================================
 export async function registerUser(email, password, fullName) {
     const { data, error } = await supabase.auth.signUp({
         email,
@@ -32,53 +151,23 @@ export async function registerUser(email, password, fullName) {
     return data;
 }
 
-// Logout function
-export async function logoutUser() {
-    const { error } = await supabase.auth.signOut();
-    if (error) throw error;
-}
-
-// Update UI based on auth state
-// js/auth.js - updateAuthUI function এর আপডেটেড ভার্সন
-
-export function updateAuthUI(user) {
-    // সব এলিমেন্টকে আলাদাভাবে সিলেক্ট করুন
-    const authLinks = document.getElementById('authLinks');
-    const userMenu = document.getElementById('userMenu');
-    const userName = document.getElementById('userName');
-    const userAvatar = document.getElementById('userAvatar');
-    const adminLink = document.getElementById('adminLink');
-
-    if (user) {
-        // ইউজার লগইন থাকলে:
-        // ১. অথ লিংক লুকান
-        if (authLinks) authLinks.style.display = 'none';
-        
-        // ২. ইউজার মেনু দেখান
-        if (userMenu) userMenu.style.display = 'block';
-        
-        // ৩. ইউজারের নাম ও ছবি আপডেট করুন
-        if (userName) {
-            userName.textContent = user.user_metadata?.full_name || 'User';
-        }
-        if (userAvatar) {
-            userAvatar.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.user_metadata?.full_name || 'User')}&background=8B5CF6&color=fff&size=32`;
-        }
-        
-        // ৪. অ্যাডমিন লিংক দেখান (শুধু অ্যাডমিনদের জন্য)
-        if (adminLink) {
-            if (user.user_metadata?.role === 'admin') {
-                adminLink.style.display = 'block';
-            } else {
-                adminLink.style.display = 'none';
-            }
-        }
-    } else {
-        // ইউজার লগইন না থাকলে:
-        // ১. অথ লিংক দেখান
-        if (authLinks) authLinks.style.display = 'flex';
-        
-        // ২. ইউজার মেনু লুকান
-        if (userMenu) userMenu.style.display = 'none';
+// =============================================
+// 8. TOAST
+// =============================================
+function showToast(message, type = 'info') {
+    const toast = document.getElementById('toast');
+    if (!toast) {
+        const newToast = document.createElement('div');
+        newToast.id = 'toast';
+        newToast.className = 'toast';
+        document.body.appendChild(newToast);
+        setTimeout(() => showToast(message, type), 100);
+        return;
     }
+    toast.textContent = message;
+    toast.className = `toast show ${type}`;
+    if (window.toastTimeout) clearTimeout(window.toastTimeout);
+    window.toastTimeout = setTimeout(() => {
+        toast.classList.remove('show');
+    }, 3000);
 }

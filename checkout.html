@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>চেকআউট - রূপকথা</title>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.5.1/css/all.css" />
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/dark-theme.css" />
+    <link rel="stylesheet" href="css/responsive.css" />
+</head>
+<body>
+    <!-- ===== NAVIGATION ===== -->
+    <nav class="navbar" id="mainNav">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo">
+                <i class="fas fa-spa"></i>
+                <span>রূপকথা</span>
+                <small>Beauty</small>
+            </a>
+            <button class="nav-toggle" id="navToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="index.html">হোম</a></li>
+                <li><a href="products.html">প্রোডাক্ট</a></li>
+                <li><a href="cart.html">কার্ট <span class="cart-badge" id="cartBadge">0</span></a></li>
+                <li class="auth-links" id="authLinks">
+                    <a href="login.html" class="btn-outline-light">লগইন</a>
+                    <a href="register.html" class="btn-primary">রেজিস্টার</a>
+                </li>
+                <li class="user-menu" id="userMenu" style="display:none;">
+                    <div class="user-dropdown">
+                        <button class="user-btn" id="userBtn">
+                            <img id="userAvatar" src="https://ui-avatars.com/api/?name=User&background=8B5CF6&color=fff&size=32" alt="Avatar" />
+                            <span id="userName">User</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="dropdown-menu" id="dropdownMenu">
+                            <a href="admin-dashboard.html" id="adminLink" style="display:none;">📊 ড্যাশবোর্ড</a>
+                            <a href="profile.html">প্রোফাইল</a>
+                            <a href="orders.html">অর্ডার</a>
+                            <hr />
+                            <a href="#" id="logoutBtn">লগআউট</a>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- ===== CHECKOUT SECTION ===== -->
+    <section style="padding-top: 120px; padding-bottom: 60px;">
+        <div class="container" style="max-width: 900px; margin: 0 auto;">
+            <div class="section-header">
+                <span class="section-tag">অর্ডার</span>
+                <h2>🛒 চেকআউট</h2>
+                <p>আপনার অর্ডার কনফর্ম করতে নিচের ফর্মটি পূরণ করুন</p>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px;">
+                <!-- Order Form -->
+                <div style="background: var(--dark-card); padding: 30px; border-radius: var(--radius); border: 1px solid var(--dark-border);">
+                    <h3 style="margin-bottom: 20px;">📋 ডেলিভারি তথ্য</h3>
+                    <form id="checkoutForm">
+                        <div style="margin-bottom: 16px;">
+                            <label style="display: block; margin-bottom: 6px; font-weight: 500;">নাম *</label>
+                            <input type="text" id="shippingName" required
+                                   style="width: 100%; padding: 12px; background: var(--dark); border: 1px solid var(--dark-border); border-radius: 8px; color: white;" />
+                        </div>
+                        <div style="margin-bottom: 16px;">
+                            <label style="display: block; margin-bottom: 6px; font-weight: 500;">ফোন *</label>
+                            <input type="tel" id="shippingPhone" required
+                                   style="width: 100%; padding: 12px; background: var(--dark); border: 1px solid var(--dark-border); border-radius: 8px; color: white;" />
+                        </div>
+                        <div style="margin-bottom: 16px;">
+                            <label style="display: block; margin-bottom: 6px; font-weight: 500;">ঠিকানা *</label>
+                            <textarea id="shippingAddress" required rows="3"
+                                      style="width: 100%; padding: 12px; background: var(--dark); border: 1px solid var(--dark-border); border-radius: 8px; color: white;"></textarea>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                            <div style="margin-bottom: 16px;">
+                                <label style="display: block; margin-bottom: 6px; font-weight: 500;">শহর *</label>
+                                <input type="text" id="shippingCity" required
+                                       style="width: 100%; padding: 12px; background: var(--dark); border: 1px solid var(--dark-border); border-radius: 8px; color: white;" />
+                            </div>
+                            <div style="margin-bottom: 16px;">
+                                <label style="display: block; margin-bottom: 6px; font-weight: 500;">পোস্টাল</label>
+                                <input type="text" id="shippingPostal"
+                                       style="width: 100%; padding: 12px; background: var(--dark); border: 1px solid var(--dark-border); border-radius: 8px; color: white;" />
+                            </div>
+                        </div>
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 6px; font-weight: 500;">পেমেন্ট পদ্ধতি *</label>
+                            <select id="paymentMethod" required
+                                    style="width: 100%; padding: 12px; background: var(--dark); border: 1px solid var(--dark-border); border-radius: 8px; color: white;">
+                                <option value="cash">ক্যাশ অন ডেলিভারি (COD)</option>
+                                <option value="bkash">bKash</option>
+                                <option value="nagad">Nagad</option>
+                                <option value="rocket">Rocket</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn-primary" style="width: 100%; padding: 14px; font-size: 18px;" id="placeOrderBtn">
+                            <i class="fas fa-check-circle"></i> অর্ডার কনফর্ম করুন
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Order Summary -->
+                <div style="background: var(--dark-card); padding: 30px; border-radius: var(--radius); border: 1px solid var(--dark-border); align-self: start;">
+                    <h3 style="margin-bottom: 20px;">🛍️ অর্ডার সামারি</h3>
+                    <div id="orderSummary">
+                        <div id="cartItemsList" style="margin-bottom: 20px; max-height: 400px; overflow-y: auto;">
+                            <!-- Cart items will be loaded here -->
+                        </div>
+                        <div style="border-top: 1px solid var(--dark-border); padding-top: 16px;">
+                            <div style="display: flex; justify-content: space-between; font-weight: 600; font-size: 1.2rem;">
+                                <span>মোট:</span>
+                                <span id="totalAmount">৳০.০০</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="emptyCartMessage" style="display: none; text-align: center; padding: 20px;">
+                        <i class="fas fa-shopping-cart" style="font-size: 3rem; color: var(--text-secondary);"></i>
+                        <p style="color: var(--text-secondary); margin-top: 12px;">আপনার কার্ট খালি!</p>
+                        <a href="products.html" class="btn-primary" style="display: inline-block; margin-top: 16px;">
+                            <i class="fas fa-shopping-bag"></i> প্রোডাক্ট ব্রাউজ করুন
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== TOAST ===== -->
+    <div id="toast" class="toast"></div>
+
+    <!-- ===== SCRIPTS ===== -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script type="module">
+        // ===== IMPORTS =====
+        import { supabase } from './js/config.js';
+        import { checkAuth, updateAuthUI, setupDropdown, setupLogout } from './js/auth.js';
+        import { updateCartBadge, getProductImage } from './js/products.js';
+        import { getCartItemsDB, clearCartDB, syncLocalCartToDB } from './js/cart.js';
+        import { placeOrder } from './js/orders.js';
+
+        const DEFAULT_IMG = 'https://res.cloudinary.com/demo/image/upload/sample.jpg';
+        let currentUser = null;
+
+        // ===== INIT =====
+        const user = await checkAuth();
+        currentUser = user;
+        updateAuthUI(user);
+        setupDropdown();
+        setupLogout();
+
+        if (!user) {
+            window.location.href = 'login.html?redirect=checkout.html';
+        }
+
+        // Sync local cart to DB
+        if (user) {
+            await syncLocalCartToDB();
+        }
+        await updateCartBadge();
+
+        // ===== LOAD CART ITEMS =====
+        async function loadCartItems() {
+            // ✅ Use DB function
+            const items = await getCartItemsDB();
+            const container = document.getElementById('cartItemsList');
+            const totalSpan = document.getElementById('totalAmount');
+            const emptyMsg = document.getElementById('emptyCartMessage');
+            const summary = document.getElementById('orderSummary');
+            const orderBtn = document.getElementById('placeOrderBtn');
+
+            if (!items || items.length === 0) {
+                container.innerHTML = '';
+                summary.style.display = 'none';
+                emptyMsg.style.display = 'block';
+                orderBtn.disabled = true;
+                return;
+            }
+
+            summary.style.display = 'block';
+            emptyMsg.style.display = 'none';
+            orderBtn.disabled = false;
+
+            let total = 0;
+            container.innerHTML = items.map(item => {
+                const imageUrl = getProductImage(item) || DEFAULT_IMG;
+                const itemTotal = item.price * item.quantity;
+                total += itemTotal;
+                return `
+                    <div style="display: flex; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--dark-border); align-items: center;">
+                        <img src="${imageUrl}" alt="${item.name}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;" onerror="this.src='${DEFAULT_IMG}'; this.onerror=null;" />
+                        <div style="flex: 1;">
+                            <p style="font-weight: 500;">${item.name}</p>
+                            <p style="color: var(--text-secondary); font-size: 14px;">${item.quantity} × ৳${item.price.toFixed(2)}</p>
+                        </div>
+                        <p style="font-weight: 600;">৳${itemTotal.toFixed(2)}</p>
+                    </div>
+                `;
+            }).join('');
+
+            totalSpan.textContent = `৳${total.toFixed(2)}`;
+        }
+
+        loadCartItems();
+
+        // ===== PLACE ORDER =====
+        document.getElementById('checkoutForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const btn = document.getElementById('placeOrderBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> অর্ডার প্রসেসিং...';
+
+            try {
+                const name = document.getElementById('shippingName').value.trim();
+                const phone = document.getElementById('shippingPhone').value.trim();
+                const address = document.getElementById('shippingAddress').value.trim();
+                const city = document.getElementById('shippingCity').value.trim();
+                const postal = document.getElementById('shippingPostal').value.trim();
+                const paymentMethod = document.getElementById('paymentMethod').value;
+
+                if (!name || !phone || !address || !city) {
+                    throw new Error('দয়া করে সব ফিল্ড পূরণ করুন!');
+                }
+
+                const { data: { user } } = await supabase.auth.getUser();
+                if (!user) {
+                    window.location.href = 'login.html?redirect=checkout.html';
+                    return;
+                }
+
+                // ✅ Use DB function
+                const items = await getCartItemsDB();
+                if (!items || items.length === 0) {
+                    throw new Error('কার্ট খালি!');
+                }
+
+                const total = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
+                const order = await placeOrder({
+                    userId: user.id,
+                    items,
+                    total,
+                    shippingInfo: { name, phone, address, city, postal },
+                    paymentMethod
+                });
+
+                // ✅ Clear cart from DB
+                await clearCartDB();
+                await updateCartBadge();
+
+                showToast('🎉 অর্ডার সফল! অর্ডার নম্বর: ' + order.order_number, 'success');
+                
+                setTimeout(() => {
+                    window.location.href = 'orders.html';
+                }, 3000);
+
+            } catch (error) {
+                console.error('Order error:', error);
+                showToast('❌ ' + error.message, 'error');
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-check-circle"></i> অর্ডার কনফর্ম করুন';
+            }
+        });
+
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast show ${type}`;
+            setTimeout(() => toast.classList.remove('show'), 4000);
+        }
+    </script>
+</body>
+</html>

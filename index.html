@@ -8,7 +8,7 @@
     <!-- Font Awesome 6 (Free) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap" />
     <!-- Main Stylesheet -->
     <link rel="stylesheet" href="css/style.css" />
     <link rel="stylesheet" href="css/dark-theme.css" />
@@ -32,8 +32,10 @@
             <ul class="nav-menu" id="navMenu">
                 <li><a href="index.html" class="active"><i class="fas fa-home"></i> হোম</a></li>
                 <li><a href="products.html"><i class="fas fa-palette"></i> প্রোডাক্ট</a></li>
-                <li><a href="blog.html"><i class="fas fa-newspaper"></i> ব্লগ</a></li>
-                <li><a href="cart.html" id="cartNav"><i class="fas fa-shopping-bag"></i> কার্ট <span class="cart-badge" id="cartBadge">0</span></a></li>
+                <li><a href="cart.html"><i class="fas fa-shopping-bag"></i> কার্ট <span class="cart-badge" id="cartBadge">0</span></a></li>
+                <li><a href="admin-login.html" class="btn-outline-light" style="border-color: var(--primary); color: var(--primary);">
+                    <i class="fas fa-shield-alt"></i> অ্যাডমিন
+                </a></li>
                 <li class="auth-links" id="authLinks">
                     <a href="login.html" class="btn-outline-light"><i class="fas fa-sign-in-alt"></i> লগইন</a>
                     <a href="register.html" class="btn-primary"><i class="fas fa-user-plus"></i> রেজিস্টার</a>
@@ -46,9 +48,9 @@
                             <i class="fas fa-chevron-down"></i>
                         </button>
                         <div class="dropdown-menu" id="dropdownMenu">
+                            <a href="admin-dashboard.html" id="adminLink" style="display:none;"><i class="fas fa-chart-pie"></i> ড্যাশবোর্ড</a>
                             <a href="profile.html"><i class="fas fa-user-cog"></i> প্রোফাইল</a>
                             <a href="orders.html"><i class="fas fa-box"></i> অর্ডার</a>
-                            <a href="admin.html" id="adminLink" style="display:none;"><i class="fas fa-shield-alt"></i> অ্যাডমিন</a>
                             <hr />
                             <a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> লগআউট</a>
                         </div>
@@ -58,61 +60,86 @@
         </div>
     </nav>
 
-    <!-- ===================== HERO SECTION ===================== -->
-    <section class="hero" id="homeHero">
-        <div class="hero-overlay"></div>
-        <div class="hero-content">
-            <div class="hero-badge">✨ নতুন সংগ্রহ ২০২৬</div>
-            <h1 class="hero-title">
-                <span class="highlight">রূপকথা</span> <br />
-                <span class="sub-text">Fairy Tale of Beauty</span>
-            </h1>
-            <p class="hero-desc">
-                বাংলাদেশের প্রথম প্রিমিয়াম মেকআপ ব্র্যান্ড – যেখানে রূপ আর রঙের মিলনে
-                তৈরি হয় এক অনন্য গল্প।
-            </p>
-            <div class="hero-actions">
-                <a href="products.html" class="btn-hero-primary">
-                    <i class="fas fa-shopping-bag"></i> শপ করুন
-                </a>
-                <a href="#featured" class="btn-hero-secondary">
-                    <i class="fas fa-play-circle"></i> দেখুন
-                </a>
+    <!-- ===================== HERO: SLIDER + SPECIAL CARDS ===================== -->
+    <!-- ===================== HERO: SLIDER + SPECIAL CARDS ===================== -->
+<section class="hero-grid">
+    <div class="container">
+        <div class="hero-container">
+            
+            <!-- ===== LEFT: SLIDER (75%) ===== -->
+            <div id="sliderContainer">
+                <div id="sliderWrapper">
+                    <!-- Slides will be loaded dynamically -->
+                </div>
+                
+                <!-- Slider Controls -->
+                <button onclick="window.prevSlide()">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <button onclick="window.nextSlide()">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+                
+                <!-- Dots -->
+                <div id="sliderDots"></div>
             </div>
-            <div class="hero-stats">
-                <div class="stat-item">
-                    <span class="stat-number">৫০০+</span>
-                    <span class="stat-label">প্রোডাক্ট</span>
+
+            <!-- ===== RIGHT: SPECIAL CARDS (25%) ===== -->
+            <div class="special-cards">
+                <!-- Card 1: Special Offer -->
+                <div class="special-card" style="background: linear-gradient(135deg, #1A1A2E, #2D1B3D);">
+                    <span style="display:inline-block;background:linear-gradient(135deg,#EF4444,#DC2626);color:white;padding:4px 14px;border-radius:50px;font-size:12px;font-weight:600;margin-bottom:8px;">
+                        🔥 স্পেশাল অফার
+                    </span>
+                    <h4 style="font-size:1.1rem;margin-bottom:4px;">৩০% ডিসকাউন্ট</h4>
+                    <p style="color:var(--text-secondary);font-size:13px;">সীমিত সময়ের জন্য</p>
+                    <a href="products.html" class="btn-primary" style="padding:8px 20px;font-size:13px;margin-top:10px;">
+                        শপ করুন <i class="fas fa-arrow-right"></i>
+                    </a>
                 </div>
-                <div class="stat-item">
-                    <span class="stat-number">১০০০+</span>
-                    <span class="stat-label">সন্তুষ্ট ক্রেতা</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-number">৯৮%</span>
-                    <span class="stat-label">সন্তুষ্টি স্কোর</span>
+
+                <!-- Card 2: Best Seller -->
+                <div class="special-card">
+                    <span style="display:inline-block;background:rgba(139,92,246,0.2);color:var(--primary);padding:4px 14px;border-radius:50px;font-size:12px;font-weight:600;margin-bottom:8px;">
+                        ⭐ বেস্ট সেলার
+                    </span>
+                    <h4 style="font-size:1.1rem;margin-bottom:4px;">রূপকথা ফাউন্ডেশন</h4>
+                    <p style="color:var(--text-secondary);font-size:13px;">৳৮৯৯</p>
+                    <button onclick="window.addToCart('product-id-here')" class="btn-primary" style="padding:8px 20px;font-size:13px;margin-top:10px;">
+                        <i class="fas fa-shopping-bag"></i> অ্যাড
+                    </button>
                 </div>
             </div>
         </div>
-        <div class="hero-scroll">
-            <span>স্ক্রোল করুন</span>
-            <i class="fas fa-chevron-down"></i>
-        </div>
-    </section>
+    </div>
+</section>
 
     <!-- ===================== CATEGORIES ===================== -->
-    <section class="categories" id="categories">
-        <div class="container">
-            <div class="section-header">
-                <span class="section-tag">ব্রাউজ</span>
-                <h2>ক্যাটাগরি <span class="highlight">ব্রাউজ</span> করুন</h2>
-                <p>আপনার পছন্দের মেকআপ ক্যাটাগরি খুঁজে নিন</p>
-            </div>
-            <div class="category-grid" id="categoryGrid">
-                <!-- dynamically loaded -->
-            </div>
+    <!-- ===== CATEGORIES SECTION (আপডেটেড) ===== -->
+<section class="categories" id="categories">
+    <div class="container">
+        <div class="section-header">
+            <span class="section-tag">ব্রাউজ</span>
+            <h2>ক্যাটাগরি <span class="highlight">ব্রাউজ</span> করুন</h2>
+            <p>আপনার পছন্দের ক্যাটাগরি নির্বাচন করুন</p>
         </div>
-    </section>
+        
+        <!-- Category Buttons -->
+        <div class="category-filter-wrapper">
+            <div class="category-filter" id="categoryFilter">
+                <!-- Categories will be loaded here -->
+            </div>
+            <a href="products.html" class="btn-outline-light view-all-btn">
+                <i class="fas fa-th-large"></i> সব প্রোডাক্ট দেখুন
+            </a>
+        </div>
+
+        <!-- Category Products -->
+        <div id="categoryProductsContainer">
+            <!-- Products will be loaded here when category is clicked -->
+        </div>
+    </div>
+</section>
 
     <!-- ===================== FEATURED PRODUCTS ===================== -->
     <section class="featured" id="featured">
@@ -129,6 +156,29 @@
                 <a href="products.html" class="btn-primary btn-lg">
                     সব প্রোডাক্ট দেখুন <i class="fas fa-arrow-right"></i>
                 </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================== BANNER SECTION ===================== -->
+    <section style="padding: 60px 0; background: var(--dark);">
+        <div class="container">
+            <div id="bannerContainer" style="display: flex; flex-direction: column; gap: 30px;">
+                <!-- Banners will be loaded here -->
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================== OFFERS SECTION ===================== -->
+    <section class="featured" style="padding: 80px 0; background: var(--dark-card);">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">অফার</span>
+                <h2>🔥 স্পেশাল <span class="highlight">অফার</span></h2>
+                <p>সীমিত সময়ের জন্য বিশেষ ডিসকাউন্ট</p>
+            </div>
+            <div id="offersGrid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px;">
+                <!-- Offers will be loaded here -->
             </div>
         </div>
     </section>
@@ -218,7 +268,7 @@
                     <h4>কুইক লিংক</h4>
                     <ul>
                         <li><a href="products.html">প্রোডাক্ট</a></li>
-                        <li><a href="blog.html">ব্লগ</a></li>
+                        <li><a href="cart.html">কার্ট</a></li>
                         <li><a href="about.html">আমাদের সম্পর্কে</a></li>
                         <li><a href="contact.html">যোগাযোগ</a></li>
                     </ul>
@@ -242,7 +292,6 @@
             <div class="footer-bottom">
                 <p>&copy; ২০২৬ <strong>রূপকথা</strong> – সর্বস্বত্ব সংরক্ষিত।</p>
                 <p>বাংলাদেশের জন্য গর্বের সাথে তৈরি 💜</p>
-                <a href="admin-manage-products.html">📋 প্রোডাক্ট লিস্ট</a>
             </div>
         </div>
     </footer>

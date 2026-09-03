@@ -94,12 +94,34 @@
                     </select>
                 </div>
 
-                <div style="margin-bottom: 20px;">
-                    <label style="display: block; margin-bottom: 8px; font-weight: 600;">প্রোডাক্ট ইমেজ URL</label>
-                    <input type="text" id="productImage" 
-                           style="width: 100%; padding: 12px; background: var(--dark); border: 1px solid var(--dark-border); border-radius: 8px; color: white; font-size: 16px;" />
-                    <small style="color: var(--text-secondary);">ইমেজ চেঞ্জ করতে নতুন URL দিন অথবা ফাঁকা রাখুন</small>
-                    <div id="imagePreview" style="margin-top: 10px;"></div>
+                <!-- ✅ ইমেজ আপলোড সেকশন (আপডেটেড) -->
+                <div style="margin-bottom: 20px; border: 2px dashed var(--dark-border); padding: 20px; border-radius: 8px;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600;">📸 প্রোডাক্ট ইমেজ</label>
+                    
+                    <!-- ইমেজ প্রিভিউ -->
+                    <div id="imagePreviewContainer" style="margin-bottom: 15px; display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
+                        <!-- ডাইনামিক প্রিভিউ এখানে দেখাবে -->
+                    </div>
+
+                    <!-- ইমেজ আপলোড বাটন -->
+                    <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                        <label for="imageUpload" class="btn-primary" style="cursor: pointer; padding: 10px 20px; display: inline-block;">
+                            <i class="fas fa-upload"></i> নতুন ইমেজ আপলোড
+                        </label>
+                        <input type="file" id="imageUpload" accept="image/*" style="display: none;" />
+                        
+                        <button type="button" id="removeImageBtn" class="btn-outline-light" style="border-color: #EF4444; color: #EF4444; padding: 10px 20px;">
+                            <i class="fas fa-trash"></i> ইমেজ রিমুভ
+                        </button>
+                    </div>
+                    
+                    <small style="color: var(--text-secondary); display: block; margin-top: 8px;">
+                        নতুন ইমেজ আপলোড করলে পুরনো ইমেজ রিপ্লেস হবে। JPG, PNG, WebP সাপোর্টেড (ম্যাক্স 10MB)।
+                    </small>
+                    
+                    <!-- হিডেন ফিল্ড (পুরনো ইমেজ URL সংরক্ষণের জন্য) -->
+                    <input type="hidden" id="oldImageUrl" value="" />
+                    <input type="hidden" id="newImageUrl" value="" />
                 </div>
 
                 <div style="margin-bottom: 20px; display: flex; align-items: center; gap: 12px;">
@@ -132,6 +154,7 @@
         import { checkAuth, updateAuthUI } from './js/auth.js';
         import { updateCartBadge } from './js/products.js';
         import { isAdmin } from './js/admin.js';
+        import { uploadImageToCloudinary } from './js/upload.js';
 
         // Initialize Auth
         const user = await checkAuth();
@@ -154,6 +177,9 @@
             showMessage('❌ প্রোডাক্ট আইডি পাওয়া যায়নি!', 'error');
         }
 
+        let currentImageUrl = '';
+        let newImageFile = null;
+
         // Load Product Data
         async function loadProduct() {
             const { data, error } = await supabase
@@ -174,18 +200,80 @@
             document.getElementById('productPrice').value = data.price;
             document.getElementById('productStock').value = data.stock;
             document.getElementById('productCategory').value = data.category;
-            document.getElementById('productImage').value = data.image_url;
             document.getElementById('productFeatured').checked = data.featured;
-
+            
+            // Store old image URL
+            currentImageUrl = data.image_url;
+            document.getElementById('oldImageUrl').value = data.image_url;
+            
             // Show image preview
-            if (data.image_url) {
-                document.getElementById('imagePreview').innerHTML = `
-                    <img src="${data.image_url}" style="max-width: 200px; max-height: 200px; border-radius: 8px; border: 2px solid var(--primary);" />
+            updateImagePreview(data.image_url);
+        }
+
+        // Update image preview
+        function updateImagePreview(imageUrl) {
+            const container = document.getElementById('imagePreviewContainer');
+            if (imageUrl && imageUrl.trim() !== '') {
+                container.innerHTML = `
+                    <div style="position: relative; display: inline-block;">
+                        <img src="${imageUrl}" id="previewImg" style="max-width: 200px; max-height: 200px; border-radius: 8px; border: 2px solid var(--primary);" />
+                        <span id="imageStatus" style="display: block; font-size: 12px; color: var(--text-secondary); margin-top: 4px;">বর্তমান ইমেজ</span>
+                    </div>
+                `;
+            } else {
+                container.innerHTML = `
+                    <div style="padding: 20px; background: var(--dark); border-radius: 8px; color: var(--text-secondary); text-align: center; width: 100%;">
+                        <i class="fas fa-image" style="font-size: 2rem; display: block; margin-bottom: 8px;"></i>
+                        কোন ইমেজ নেই
+                    </div>
                 `;
             }
         }
 
         loadProduct();
+
+        // Image upload handling
+        document.getElementById('imageUpload').addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            try {
+                showMessage('⏳ ইমেজ আপলোড হচ্ছে...', 'info');
+                
+                // Upload to Cloudinary
+                const result = await uploadImageToCloudinary(file);
+                
+                // Store new image URL
+                document.getElementById('newImageUrl').value = result.url;
+                newImageFile = result.url;
+                
+                // Update preview
+                updateImagePreview(result.url);
+                
+                // Update status
+                const statusSpan = document.getElementById('imageStatus');
+                if (statusSpan) {
+                    statusSpan.textContent = '✅ নতুন ইমেজ (আপলোড হয়েছে)';
+                    statusSpan.style.color = '#10B981';
+                }
+                
+                showMessage('✅ ইমেজ আপলোড সফল! ফর্ম সাবমিট করলে আপডেট হবে।', 'success');
+                
+            } catch (error) {
+                console.error('Upload error:', error);
+                showMessage('❌ ইমেজ আপলোড ব্যর্থ: ' + error.message, 'error');
+            }
+        });
+
+        // Remove image
+        document.getElementById('removeImageBtn').addEventListener('click', () => {
+            if (confirm('আপনি কি এই ইমেজটি রিমুভ করতে চান? (ডিফল্ট ইমেজ সেট হবে)')) {
+                document.getElementById('newImageUrl').value = '';
+                newImageFile = '';
+                updateImagePreview('');
+                showMessage('ℹ️ ইমেজ রিমুভ করা হয়েছে। ফর্ম সাবমিট করলে ডিফল্ট ইমেজ সেট হবে।', 'info');
+            }
+        });
 
         // Form Submit
         const form = document.getElementById('editForm');
@@ -205,21 +293,20 @@
                 const category = document.getElementById('productCategory').value;
                 const stock = parseInt(document.getElementById('productStock').value);
                 const featured = document.getElementById('productFeatured').checked;
-                let image_url = document.getElementById('productImage').value.trim();
+                
+                // Determine image URL: new > old > default
+                let imageUrl = document.getElementById('newImageUrl').value;
+                if (!imageUrl) {
+                    imageUrl = document.getElementById('oldImageUrl').value;
+                }
+                // If no image at all, use a default placeholder
+                if (!imageUrl) {
+                    imageUrl = 'https://via.placeholder.com/300x300/1A1A1A/8B5CF6?text=No+Image';
+                }
 
                 // Validation
                 if (!name || !description || !price || !category) {
                     throw new Error('দয়া করে সব ফিল্ড পূরণ করুন!');
-                }
-
-                // If no new image URL, keep the old one
-                if (!image_url) {
-                    const { data } = await supabase
-                        .from('products')
-                        .select('image_url')
-                        .eq('id', productId)
-                        .single();
-                    image_url = data.image_url;
                 }
 
                 // Update product
@@ -230,7 +317,7 @@
                         description,
                         price,
                         category,
-                        image_url,
+                        image_url: imageUrl,
                         stock,
                         featured,
                         updated_at: new Date().toISOString()
@@ -258,13 +345,24 @@
         function showMessage(message, type = 'info') {
             messageBox.style.display = 'block';
             messageBox.innerHTML = message;
-            messageBox.style.background = type === 'error' ? 'rgba(239, 68, 68, 0.1)' : 'rgba(16, 185, 129, 0.1)';
-            messageBox.style.color = type === 'error' ? '#EF4444' : '#10B981';
-            messageBox.style.border = `1px solid ${type === 'error' ? '#EF4444' : '#10B981'}`;
+            
+            if (type === 'error') {
+                messageBox.style.background = 'rgba(239, 68, 68, 0.1)';
+                messageBox.style.color = '#EF4444';
+                messageBox.style.border = '1px solid #EF4444';
+            } else if (type === 'success') {
+                messageBox.style.background = 'rgba(16, 185, 129, 0.1)';
+                messageBox.style.color = '#10B981';
+                messageBox.style.border = '1px solid #10B981';
+            } else {
+                messageBox.style.background = 'rgba(59, 130, 246, 0.1)';
+                messageBox.style.color = '#3B82F6';
+                messageBox.style.border = '1px solid #3B82F6';
+            }
             
             setTimeout(() => {
                 messageBox.style.display = 'none';
-            }, 5000);
+            }, 6000);
         }
     </script>
 </body>

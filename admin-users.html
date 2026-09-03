@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ইউজার ম্যানেজ - রূপকথা</title>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.5.1/css/all.css" />
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/dark-theme.css" />
+    <link rel="stylesheet" href="css/responsive.css" />
+    <style>
+        .user-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        .user-table th {
+            text-align: left;
+            padding: 12px;
+            color: var(--text-secondary);
+            border-bottom: 2px solid var(--dark-border);
+            font-weight: 600;
+        }
+        .user-table td {
+            padding: 12px;
+            border-bottom: 1px solid var(--dark-border);
+        }
+        .user-table tr:hover {
+            background: rgba(139, 92, 246, 0.05);
+        }
+        .role-badge {
+            padding: 4px 12px;
+            border-radius: 50px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .role-admin {
+            background: rgba(139, 92, 246, 0.2);
+            color: #8B5CF6;
+        }
+        .role-user {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10B981;
+        }
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        .search-box {
+            width: 100%;
+            max-width: 300px;
+            padding: 10px 16px;
+            background: var(--dark);
+            border: 1px solid var(--dark-border);
+            border-radius: 8px;
+            color: white;
+            font-size: 14px;
+        }
+        .search-box:focus {
+            border-color: var(--primary);
+            outline: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- ===== NAVIGATION ===== -->
+    <nav class="navbar" id="mainNav">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo">
+                <i class="fas fa-spa"></i>
+                <span>রূপকথা</span>
+                <small>Beauty</small>
+            </a>
+            <button class="nav-toggle" id="navToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="index.html">হোম</a></li>
+                <li><a href="products.html">প্রোডাক্ট</a></li>
+                <li><a href="cart.html">কার্ট <span class="cart-badge" id="cartBadge">0</span></a></li>
+                <li class="auth-links" id="authLinks">
+                    <a href="login.html" class="btn-outline-light">লগইন</a>
+                    <a href="register.html" class="btn-primary">রেজিস্টার</a>
+                </li>
+                <li class="user-menu" id="userMenu" style="display:none;">
+                    <div class="user-dropdown">
+                        <button class="user-btn" id="userBtn">
+                            <img id="userAvatar" src="https://ui-avatars.com/api/?name=User&background=8B5CF6&color=fff&size=32" alt="Avatar" />
+                            <span id="userName">User</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="dropdown-menu" id="dropdownMenu">
+                            <a href="admin-dashboard.html"><i class="fas fa-chart-pie"></i> ড্যাশবোর্ড</a>
+                            <a href="admin-add-product.html"><i class="fas fa-plus-circle"></i> প্রোডাক্ট যোগ</a>
+                            <a href="admin-manage-products.html"><i class="fas fa-list"></i> প্রোডাক্ট লিস্ট</a>
+                            <a href="admin-categories.html"><i class="fas fa-folder"></i> ক্যাটাগরি</a>
+                            <a href="admin-orders.html"><i class="fas fa-box"></i> অর্ডার</a>
+                            <a href="admin-users.html"><i class="fas fa-users"></i> ইউজার</a>
+                            <hr />
+                            <a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> লগআউট</a>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- ===== USERS SECTION ===== -->
+    <section style="padding-top: 120px; padding-bottom: 60px;">
+        <div class="container">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 30px;">
+                <div>
+                    <span class="section-tag">অ্যাডমিন</span>
+                    <h2 style="font-family: 'Playfair Display', serif; font-size: 2.5rem;">👥 ইউজার লিস্ট</h2>
+                    <p style="color: var(--text-secondary);">আপনার ওয়েবসাইটের সকল ইউজার দেখুন</p>
+                </div>
+                <div>
+                    <input type="text" id="searchUser" class="search-box" placeholder="🔍 ইউজার খুঁজুন..." />
+                </div>
+            </div>
+
+            <!-- ===== USERS TABLE ===== -->
+            <div id="loadingSpinner" style="text-align: center; padding: 40px 0;">
+                <i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: var(--primary);"></i>
+                <p style="color: var(--text-secondary); margin-top: 12px;">ইউজার লোড হচ্ছে...</p>
+            </div>
+
+            <div id="usersContainer" style="display: none;">
+                <div style="background: var(--dark-card); border-radius: var(--radius); padding: 24px; border: 1px solid var(--dark-border); overflow-x: auto;">
+                    <table class="user-table" id="usersTable">
+                        <thead>
+                            <tr>
+                                <th>ইউজার</th>
+                                <th>ইমেইল</th>
+                                <th>রোল</th>
+                                <th>যোগদানের তারিখ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usersTableBody">
+                            <!-- Users will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+                <div id="noUsers" style="display: none; text-align: center; padding: 40px; color: var(--text-secondary);">
+                    <i class="fas fa-users-slash" style="font-size: 3rem; display: block; margin-bottom: 12px;"></i>
+                    <p>কোনো ইউজার পাওয়া যায়নি</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div id="toast" class="toast"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script type="module">
+        import { checkAuth, updateAuthUI, setupDropdown, setupLogout } from './js/auth.js';
+        import { updateCartBadge } from './js/products.js';
+        import { isAdmin, getAllUsers } from './js/admin.js';
+
+        // ===== INIT =====
+        const user = await checkAuth();
+        updateAuthUI(user);
+        updateCartBadge();
+        setupDropdown();
+        setupLogout();
+
+        const admin = await isAdmin();
+        if (!admin) {
+            document.querySelector('section').innerHTML = `
+                <div style="text-align:center;padding:60px 0;">
+                    <i class="fas fa-shield-alt" style="font-size:3rem;color:#EF4444;display:block;margin-bottom:16px;"></i>
+                    <h2 style="color:#EF4444;">⛔ অ্যাক্সেস অস্বীকৃত</h2>
+                    <p style="color:var(--text-secondary);">শুধুমাত্র অ্যাডমিন ইউজার এই পেজ দেখতে পারেন।</p>
+                    <a href="index.html" class="btn-primary" style="display:inline-block;margin-top:16px;">
+                        <i class="fas fa-home"></i> হোমপেজে যান
+                    </a>
+                </div>
+            `;
+        } else {
+            await loadUsers();
+        }
+
+        // ===== LOAD USERS =====
+        async function loadUsers() {
+            const spinner = document.getElementById('loadingSpinner');
+            const container = document.getElementById('usersContainer');
+            const tableBody = document.getElementById('usersTableBody');
+            const noUsers = document.getElementById('noUsers');
+
+            try {
+                const users = await getAllUsers();
+                spinner.style.display = 'none';
+                container.style.display = 'block';
+
+                if (!users || users.length === 0) {
+                    noUsers.style.display = 'block';
+                    return;
+                }
+
+                noUsers.style.display = 'none';
+                renderUsers(users);
+
+            } catch (error) {
+                console.error('Error loading users:', error);
+                spinner.style.display = 'none';
+                container.style.display = 'block';
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="4" style="text-align:center;padding:40px;color:#EF4444;">
+                            <i class="fas fa-exclamation-triangle" style="font-size:2rem;display:block;margin-bottom:8px;"></i>
+                            ইউজার লোড করতে ব্যর্থ! <br />
+                            <small style="color:var(--text-secondary);">${error.message}</small>
+                        </td>
+                    </tr>
+                `;
+            }
+        }
+
+        // ===== RENDER USERS =====
+        function renderUsers(users) {
+            const tableBody = document.getElementById('usersTableBody');
+            
+            tableBody.innerHTML = users.map(user => {
+                const name = user.user_metadata?.full_name || 'নাম নেই';
+                const email = user.email || 'ইমেইল নেই';
+                const role = user.user_metadata?.role || 'user';
+                const createdAt = new Date(user.created_at).toLocaleDateString('bn-BD', {
+                    day: 'numeric',
+                    month: 'short',
+                    year: 'numeric'
+                });
+                const avatar = name.charAt(0).toUpperCase();
+
+                return `
+                    <tr>
+                        <td>
+                            <div style="display:flex;align-items:center;gap:12px;">
+                                <div class="user-avatar">${avatar}</div>
+                                <span>${name}</span>
+                            </div>
+                        </td>
+                        <td>${email}</td>
+                        <td><span class="role-badge ${role === 'admin' ? 'role-admin' : 'role-user'}">${role === 'admin' ? '🔑 অ্যাডমিন' : '👤 ইউজার'}</span></td>
+                        <td>${createdAt}</td>
+                    </tr>
+                `;
+            }).join('');
+
+            // ===== SEARCH FUNCTIONALITY =====
+            const searchInput = document.getElementById('searchUser');
+            searchInput.addEventListener('input', (e) => {
+                const query = e.target.value.toLowerCase();
+                const rows = tableBody.querySelectorAll('tr');
+                rows.forEach(row => {
+                    const text = row.textContent.toLowerCase();
+                    row.style.display = text.includes(query) ? '' : 'none';
+                });
+            });
+        }
+    </script>
+</body>
+</html>

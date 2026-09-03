@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>স্লাইডার ম্যানেজ - রূপকথা</title>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.5.1/css/all.css" />
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/dark-theme.css" />
+    <link rel="stylesheet" href="css/responsive.css" />
+    <style>
+        .slider-card {
+            background: var(--dark-card);
+            border: 1px solid var(--dark-border);
+            border-radius: var(--radius);
+            padding: 20px;
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            margin-bottom: 16px;
+            transition: var(--transition);
+        }
+        .slider-card:hover { border-color: var(--primary); }
+        .slider-card img { width: 120px; height: 80px; object-fit: cover; border-radius: 8px; }
+        .slider-card .info { flex: 1; }
+        .slider-card .info h4 { margin-bottom: 4px; }
+        .slider-card .info p { color: var(--text-secondary); font-size: 13px; }
+        .slider-card .actions { display: flex; gap: 8px; }
+        .slider-card .actions button { padding: 6px 14px; border-radius: 6px; border: none; cursor: pointer; font-size: 13px; transition: var(--transition); }
+        .btn-edit-slider { background: var(--primary); color: white; }
+        .btn-edit-slider:hover { background: var(--primary-dark); }
+        .btn-delete-slider { background: transparent; color: #EF4444; border: 1px solid #EF4444; }
+        .btn-delete-slider:hover { background: #EF4444; color: white; }
+        .status-badge.active { background: rgba(16, 185, 129, 0.2); color: #10B981; }
+        .status-badge.inactive { background: rgba(239, 68, 68, 0.2); color: #EF4444; }
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-content {
+            background: var(--dark-card);
+            border-radius: var(--radius);
+            padding: 30px;
+            max-width: 550px;
+            width: 90%;
+            border: 1px solid var(--dark-border);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .modal-content .form-group { margin-bottom: 16px; }
+        .modal-content .form-group label { display: block; margin-bottom: 6px; font-weight: 500; }
+        .modal-content .form-group input,
+        .modal-content .form-group textarea,
+        .modal-content .form-group select {
+            width: 100%;
+            padding: 10px 14px;
+            background: var(--dark);
+            border: 1px solid var(--dark-border);
+            border-radius: 8px;
+            color: white;
+            font-size: 14px;
+        }
+        .modal-content .form-group input:focus,
+        .modal-content .form-group textarea:focus { border-color: var(--primary); outline: none; }
+        .modal-actions { display: flex; gap: 12px; margin-top: 16px; }
+        .modal-actions button { flex: 1; padding: 10px; border-radius: 8px; border: none; cursor: pointer; font-size: 16px; font-weight: 600; }
+        .btn-save { background: var(--primary); color: white; }
+        .btn-save:hover { background: var(--primary-dark); }
+        .btn-cancel { background: transparent; border: 1px solid var(--dark-border); color: var(--text-secondary); }
+        .btn-cancel:hover { border-color: #EF4444; color: #EF4444; }
+        .upload-preview { 
+            margin-top: 10px; 
+            padding: 10px; 
+            background: var(--dark); 
+            border-radius: 8px; 
+            border: 1px solid var(--dark-border);
+            display: none;
+        }
+        .upload-preview img { max-width: 150px; max-height: 150px; border-radius: 4px; }
+        .upload-preview .url-display { 
+            font-size: 12px; 
+            color: var(--text-secondary); 
+            word-break: break-all;
+            margin-top: 6px;
+        }
+    </style>
+</head>
+<body>
+    <!-- ===== NAVIGATION (same as before) ===== -->
+    <nav class="navbar" id="mainNav">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo">
+                <i class="fas fa-spa"></i>
+                <span>রূপকথা</span>
+                <small>Beauty</small>
+            </a>
+            <button class="nav-toggle" id="navToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="index.html">হোম</a></li>
+                <li><a href="products.html">প্রোডাক্ট</a></li>
+                <li><a href="cart.html">কার্ট <span class="cart-badge" id="cartBadge">0</span></a></li>
+                <li class="auth-links" id="authLinks">
+                    <a href="login.html" class="btn-outline-light">লগইন</a>
+                    <a href="register.html" class="btn-primary">রেজিস্টার</a>
+                </li>
+                <li class="user-menu" id="userMenu" style="display:none;">
+                    <div class="user-dropdown">
+                        <button class="user-btn" id="userBtn">
+                            <img id="userAvatar" src="https://ui-avatars.com/api/?name=User&background=8B5CF6&color=fff&size=32" alt="Avatar" />
+                            <span id="userName">User</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="dropdown-menu" id="dropdownMenu">
+                            <a href="admin-dashboard.html">📊 ড্যাশবোর্ড</a>
+                            <a href="admin-add-product.html">📦 প্রোডাক্ট যোগ</a>
+                            <a href="admin-manage-products.html">📋 প্রোডাক্ট লিস্ট</a>
+                            <a href="admin-categories.html">📂 ক্যাটাগরি</a>
+                            <a href="admin-orders.html">📋 অর্ডার</a>
+                            <a href="admin-users.html">👥 ইউজার</a>
+                            <a href="admin-sliders.html">🖼️ স্লাইডার</a>
+                            <a href="admin-banners.html">🏳️ ব্যানার</a>
+                            <a href="admin-offers.html">🏷️ অফার</a>
+                            <hr />
+                            <a href="#" id="logoutBtn">লগআউট</a>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <section style="padding-top: 120px; padding-bottom: 60px;">
+        <div class="container">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 30px;">
+                <div>
+                    <span class="section-tag">অ্যাডমিন</span>
+                    <h2 style="font-family: 'Playfair Display', serif; font-size: 2.5rem;">🖼️ স্লাইডার ম্যানেজ</h2>
+                    <p style="color: var(--text-secondary);">হোমপেজের স্লাইডার যোগ, এডিট ও ডিলিট করুন</p>
+                </div>
+                <button onclick="openAddModal()" class="btn-primary">
+                    <i class="fas fa-plus"></i> নতুন স্লাইড
+                </button>
+            </div>
+
+            <div id="loadingSpinner" style="text-align: center; padding: 40px 0;">
+                <i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: var(--primary);"></i>
+                <p style="color: var(--text-secondary); margin-top: 12px;">স্লাইডার লোড হচ্ছে...</p>
+            </div>
+
+            <div id="slidersList"></div>
+            <div id="noSliders" style="display: none; text-align: center; padding: 40px; color: var(--text-secondary);">
+                <i class="fas fa-images" style="font-size: 3rem; display: block; margin-bottom: 12px;"></i>
+                <p>কোনো স্লাইডার নেই</p>
+                <button onclick="openAddModal()" class="btn-primary" style="margin-top: 12px;">
+                    <i class="fas fa-plus"></i> প্রথম স্লাইড যোগ করুন
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== MODAL ===== -->
+    <div id="sliderModal" class="modal">
+        <div class="modal-content">
+            <h3 id="modalTitle" style="margin-bottom: 20px;">📝 নতুন স্লাইড</h3>
+            <form id="sliderForm">
+                <input type="hidden" id="sliderId" />
+                <div class="form-group">
+                    <label>শিরোনাম *</label>
+                    <input type="text" id="sliderTitle" required />
+                </div>
+                <div class="form-group">
+                    <label>উপশিরোনাম</label>
+                    <input type="text" id="sliderSubtitle" />
+                </div>
+                
+                <!-- ✅ ইমেজ আপলোড সেকশন -->
+                <div class="form-group">
+                    <label>ইমেজ আপলোড করুন</label>
+                    <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+                        <input type="file" id="sliderImageFile" accept="image/*" style="flex:1; padding: 10px; background: var(--dark); border: 1px solid var(--dark-border); border-radius: 8px; color: white;" />
+                        <button type="button" onclick="uploadSliderImage()" class="btn-primary" style="padding: 10px 20px; white-space: nowrap;">
+                            <i class="fas fa-cloud-upload-alt"></i> আপলোড
+                        </button>
+                    </div>
+                    <div id="sliderImagePreview" class="upload-preview"></div>
+                    <input type="hidden" id="sliderImage" />
+                    <small style="color: var(--text-secondary);">ইমেজ আপলোড করলে URL স্বয়ংক্রিয়ভাবে বসবে</small>
+                </div>
+
+                <div class="form-group">
+                    <label>বাটনের টেক্সট</label>
+                    <input type="text" id="sliderButtonText" placeholder="শপ করুন" />
+                </div>
+                <div class="form-group">
+                    <label>বাটনের লিংক</label>
+                    <input type="text" id="sliderButtonLink" placeholder="products.html" />
+                </div>
+                <div class="form-group">
+                    <label>অর্ডার নাম্বার</label>
+                    <input type="number" id="sliderOrder" value="0" />
+                </div>
+                <div class="form-group">
+                    <label>স্ট্যাটাস</label>
+                    <select id="sliderStatus">
+                        <option value="true">সক্রিয়</option>
+                        <option value="false">নিষ্ক্রিয়</option>
+                    </select>
+                </div>
+                <div class="modal-actions">
+                    <button type="submit" class="btn-save"><i class="fas fa-save"></i> সংরক্ষণ</button>
+                    <button type="button" class="btn-cancel" onclick="closeModal()">বাতিল</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script type="module">
+        import { supabase } from './js/config.js';
+        import { checkAuth, updateAuthUI, setupDropdown, setupLogout } from './js/auth.js';
+        import { updateCartBadge } from './js/products.js';
+        import { isAdmin } from './js/admin.js';
+        import { addSlider, updateSlider, deleteSlider } from './js/home.js';
+        import { uploadImageToCloudinary } from './js/upload.js';
+
+        // ===== INIT =====
+        const user = await checkAuth();
+        updateAuthUI(user);
+        updateCartBadge();
+        setupDropdown();
+        setupLogout();
+
+        const admin = await isAdmin();
+        if (!admin) {
+            document.querySelector('section').innerHTML = `
+                <div style="text-align:center;padding:60px 0;">
+                    <i class="fas fa-shield-alt" style="font-size:3rem;color:#EF4444;display:block;margin-bottom:16px;"></i>
+                    <h2 style="color:#EF4444;">⛔ অ্যাক্সেস অস্বীকৃত</h2>
+                    <p style="color:var(--text-secondary);">শুধুমাত্র অ্যাডমিন ইউজার এই পেজ দেখতে পারেন।</p>
+                    <a href="index.html" class="btn-primary" style="display:inline-block;margin-top:16px;">
+                        <i class="fas fa-home"></i> হোমপেজে যান
+                    </a>
+                </div>
+            `;
+        } else {
+            loadSliders();
+        }
+
+        // ===== GLOBAL FUNCTIONS =====
+        window.openAddModal = function() {
+            document.getElementById('modalTitle').textContent = '📝 নতুন স্লাইড';
+            document.getElementById('sliderForm').reset();
+            document.getElementById('sliderId').value = '';
+            document.getElementById('sliderStatus').value = 'true';
+            document.getElementById('sliderOrder').value = '0';
+            document.getElementById('sliderImagePreview').style.display = 'none';
+            document.getElementById('sliderModal').style.display = 'flex';
+        };
+
+        window.closeModal = function() {
+            document.getElementById('sliderModal').style.display = 'none';
+        };
+
+        // ✅ ইমেজ আপলোড ফাংশন
+        window.uploadSliderImage = async function() {
+            const fileInput = document.getElementById('sliderImageFile');
+            const file = fileInput.files[0];
+            if (!file) {
+                showToast('দয়া করে একটি ইমেজ নির্বাচন করুন!', 'error');
+                return;
+            }
+
+            try {
+                showToast('⏳ ইমেজ আপলোড হচ্ছে...', 'info');
+                const result = await uploadImageToCloudinary(file);
+                
+                // URL বসান
+                document.getElementById('sliderImage').value = result.url;
+                
+                // প্রিভিউ দেখান
+                const preview = document.getElementById('sliderImagePreview');
+                preview.style.display = 'block';
+                preview.innerHTML = `
+                    <img src="${result.url}" alt="Preview" />
+                    <div class="url-display">📎 ${result.url}</div>
+                `;
+                
+                showToast('✅ ইমেজ আপলোড সফল!', 'success');
+            } catch (error) {
+                console.error('Upload error:', error);
+                showToast('❌ ইমেজ আপলোড ব্যর্থ: ' + error.message, 'error');
+            }
+        };
+
+        window.editSlider = async function(id) {
+            try {
+                const { data, error } = await supabase
+                    .from('sliders')
+                    .select('*')
+                    .eq('id', id)
+                    .single();
+
+                if (error) throw error;
+
+                document.getElementById('modalTitle').textContent = '✏️ স্লাইড এডিট';
+                document.getElementById('sliderId').value = data.id;
+                document.getElementById('sliderTitle').value = data.title;
+                document.getElementById('sliderSubtitle').value = data.subtitle || '';
+                document.getElementById('sliderImage').value = data.image_url || '';
+                document.getElementById('sliderButtonText').value = data.button_text || '';
+                document.getElementById('sliderButtonLink').value = data.button_link || '';
+                document.getElementById('sliderOrder').value = data.order_number || 0;
+                document.getElementById('sliderStatus').value = data.is_active ? 'true' : 'false';
+                
+                // প্রিভিউ দেখান
+                if (data.image_url) {
+                    const preview = document.getElementById('sliderImagePreview');
+                    preview.style.display = 'block';
+                    preview.innerHTML = `
+                        <img src="${data.image_url}" alt="Preview" />
+                        <div class="url-display">📎 ${data.image_url}</div>
+                    `;
+                }
+                
+                document.getElementById('sliderModal').style.display = 'flex';
+            } catch (error) {
+                showToast('স্লাইড লোড করতে ব্যর্থ!', 'error');
+            }
+        };
+
+        window.deleteSliderItem = async function(id) {
+            if (!confirm('আপনি কি এই স্লাইড ডিলিট করতে চান?')) return;
+            try {
+                await deleteSlider(id);
+                showToast('✅ স্লাইড ডিলিট করা হয়েছে!', 'success');
+                loadSliders();
+            } catch (error) {
+                showToast('❌ ' + error.message, 'error');
+            }
+        };
+
+        // ===== LOAD SLIDERS =====
+        async function loadSliders() {
+            const container = document.getElementById('slidersList');
+            const spinner = document.getElementById('loadingSpinner');
+            const noSliders = document.getElementById('noSliders');
+
+            try {
+                const { data, error } = await supabase
+                    .from('sliders')
+                    .select('*')
+                    .order('order_number', { ascending: true });
+
+                if (error) throw error;
+
+                spinner.style.display = 'none';
+
+                if (!data || data.length === 0) {
+                    noSliders.style.display = 'block';
+                    return;
+                }
+
+                noSliders.style.display = 'none';
+                container.innerHTML = data.map(slider => `
+                    <div class="slider-card">
+                        <img src="${slider.image_url || 'https://via.placeholder.com/120x80/1A1A1A/8B5CF6?text=No+Image'}" alt="${slider.title}" onerror="this.src='https://via.placeholder.com/120x80/1A1A1A/8B5CF6?text=No+Image'" />
+                        <div class="info">
+                            <h4>${slider.title}</h4>
+                            <p>${slider.subtitle || ''}</p>
+                            <p style="font-size:12px;color:var(--text-secondary);">
+                                <span class="status-badge ${slider.is_active ? 'active' : 'inactive'}">${slider.is_active ? '✅ সক্রিয়' : '❌ নিষ্ক্রিয়'}</span>
+                                ${slider.button_text ? `🔗 ${slider.button_text}` : ''}
+                                ${slider.order_number !== undefined ? `📌 #${slider.order_number}` : ''}
+                            </p>
+                        </div>
+                        <div class="actions">
+                            <button class="btn-edit-slider" onclick="editSlider('${slider.id}')"><i class="fas fa-edit"></i></button>
+                            <button class="btn-delete-slider" onclick="deleteSliderItem('${slider.id}')"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>
+                `).join('');
+
+            } catch (error) {
+                console.error('Error loading sliders:', error);
+                spinner.style.display = 'none';
+                container.innerHTML = `<p style="color:#EF4444;">স্লাইডার লোড করতে ব্যর্থ!</p>`;
+            }
+        }
+
+        // ===== FORM SUBMIT =====
+        document.getElementById('sliderForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('sliderId').value;
+            const imageUrl = document.getElementById('sliderImage').value.trim();
+            
+            const data = {
+                title: document.getElementById('sliderTitle').value.trim(),
+                subtitle: document.getElementById('sliderSubtitle').value.trim(),
+                image_url: imageUrl || 'https://via.placeholder.com/1920x1080/1A1A1A/8B5CF6?text=No+Image',
+                button_text: document.getElementById('sliderButtonText').value.trim(),
+                button_link: document.getElementById('sliderButtonLink').value.trim(),
+                order_number: parseInt(document.getElementById('sliderOrder').value) || 0,
+                is_active: document.getElementById('sliderStatus').value === 'true'
+            };
+
+            if (!data.title) {
+                showToast('দয়া করে শিরোনাম দিন!', 'error');
+                return;
+            }
+
+            try {
+                if (id) {
+                    await updateSlider(id, data);
+                    showToast('✅ স্লাইড আপডেট করা হয়েছে!', 'success');
+                } else {
+                    await addSlider(data);
+                    showToast('✅ নতুন স্লাইড যোগ করা হয়েছে!', 'success');
+                }
+                closeModal();
+                loadSliders();
+            } catch (error) {
+                showToast('❌ ' + error.message, 'error');
+            }
+        });
+
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast show ${type}`;
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+    </script>
+</body>
+</html>

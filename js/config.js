@@ -8,7 +8,7 @@ const CLOUDINARY_UPLOAD_PRESET = 'rupkotha_preset';
 // Initialize Supabase Client
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 const supabaseAdmin = window.supabase.createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE);
-
+export const DEFAULT_IMAGE = 'https://res.cloudinary.com/nbdswgx7/image/upload/v1788179884/457134438_1933153253856578_464632734835800339_n.jpg';
 
 // Export
 export { 
@@ -18,5 +18,5 @@ export {
     SUPABASE_ANON_KEY, 
     CLOUDINARY_CLOUD_NAME,
     CLOUDINARY_UPLOAD_PRESET,
-    SUPABASE_SERVICE_ROLE 
+    SUPABASE_SERVICE_ROLE
 };

@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>অ্যাডমিন ড্যাশবোর্ড - রূপকথা</title>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.5.1/css/all.css" />
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/dark-theme.css" />
+    <link rel="stylesheet" href="css/responsive.css" />
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .stat-card {
+            background: var(--dark-card);
+            border: 1px solid var(--dark-border);
+            border-radius: var(--radius);
+            padding: 24px;
+            transition: var(--transition);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        .stat-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--primary);
+            box-shadow: 0 8px 30px rgba(139, 92, 246, 0.15);
+        }
+        .stat-card .icon {
+            font-size: 2.5rem;
+            margin-bottom: 8px;
+        }
+        .stat-card .number {
+            font-size: 2rem;
+            font-weight: 700;
+            display: block;
+        }
+        .stat-card .label {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+        .stat-card .trend {
+            font-size: 12px;
+            margin-top: 4px;
+            display: inline-block;
+        }
+        .stat-card .trend.up { color: #10B981; }
+        .stat-card .trend.down { color: #EF4444; }
+        
+        .color-purple .icon { color: #8B5CF6; }
+        .color-green .icon { color: #10B981; }
+        .color-blue .icon { color: #3B82F6; }
+        .color-orange .icon { color: #F59E0B; }
+        .color-red .icon { color: #EF4444; }
+        .color-pink .icon { color: #EC4899; }
+
+        .quick-action-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+        }
+        .quick-action-btn {
+            background: var(--dark-card);
+            border: 1px solid var(--dark-border);
+            border-radius: var(--radius);
+            padding: 20px;
+            text-align: center;
+            text-decoration: none;
+            color: var(--text-primary);
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+        .quick-action-btn:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+        .quick-action-btn i { font-size: 2rem; color: var(--primary); }
+
+        .chart-container {
+            background: var(--dark-card);
+            border-radius: var(--radius);
+            padding: 24px;
+            border: 1px solid var(--dark-border);
+        }
+        .chart-container canvas {
+            max-height: 250px;
+            max-width: 100%;
+        }
+
+        .recent-orders-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .recent-orders-table th {
+            text-align: left;
+            padding: 12px;
+            color: var(--text-secondary);
+            border-bottom: 2px solid var(--dark-border);
+        }
+        .recent-orders-table td {
+            padding: 12px;
+            border-bottom: 1px solid var(--dark-border);
+        }
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 50px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .status-pending { background: rgba(245, 158, 11, 0.2); color: #F59E0B; }
+        .status-processing { background: rgba(59, 130, 246, 0.2); color: #3B82F6; }
+        .status-shipped { background: rgba(139, 92, 246, 0.2); color: #8B5CF6; }
+        .status-delivered { background: rgba(16, 185, 129, 0.2); color: #10B981; }
+        .status-cancelled { background: rgba(239, 68, 68, 0.2); color: #EF4444; }
+
+        .activity-feed {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .activity-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--dark-border);
+        }
+        .activity-item .activity-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+        .activity-item .activity-text {
+            flex: 1;
+        }
+        .activity-item .activity-text .title {
+            font-weight: 500;
+        }
+        .activity-item .activity-text .time {
+            color: var(--text-secondary);
+            font-size: 12px;
+        }
+        .bg-purple { background: rgba(139, 92, 246, 0.2); color: #8B5CF6; }
+        .bg-green { background: rgba(16, 185, 129, 0.2); color: #10B981; }
+        .bg-blue { background: rgba(59, 130, 246, 0.2); color: #3B82F6; }
+        .bg-orange { background: rgba(245, 158, 11, 0.2); color: #F59E0B; }
+        .bg-red { background: rgba(239, 68, 68, 0.2); color: #EF4444; }
+        .bg-pink { background: rgba(236, 72, 153, 0.2); color: #EC4899; }
+
+        /* ✅ অ্যাডমিন লগইন বাটনের জন্য স্টাইল */
+        .admin-login-btn {
+            border: 2px solid var(--primary) !important;
+            color: var(--primary) !important;
+        }
+        .admin-login-btn i {
+            color: var(--primary) !important;
+        }
+        .admin-login-btn:hover {
+            background: var(--primary) !important;
+            color: white !important;
+        }
+        .admin-login-btn:hover i {
+            color: white !important;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- ===== NAVIGATION ===== -->
+    <nav class="navbar" id="mainNav">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo">
+                <i class="fas fa-spa"></i>
+                <span>রূপকথা</span>
+                <small>Beauty</small>
+            </a>
+            <button class="nav-toggle" id="navToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="index.html">হোম</a></li>
+                <li><a href="products.html">প্রোডাক্ট</a></li>
+                <li><a href="cart.html">কার্ট <span class="cart-badge" id="cartBadge">0</span></a></li>
+                <!-- ✅ অ্যাডমিন লগইন লিংক (নেভিগেশনে) -->
+                <li><a href="admin-login.html" class="btn-outline-light" style="border-color: var(--primary); color: var(--primary);">
+                    <i class="fas fa-shield-alt"></i> অ্যাডমিন লগইন
+                </a></li>
+                <li class="auth-links" id="authLinks">
+                    <a href="login.html" class="btn-outline-light">লগইন</a>
+                    <a href="register.html" class="btn-primary">রেজিস্টার</a>
+                </li>
+                <li class="user-menu" id="userMenu" style="display:none;">
+                    <div class="user-dropdown">
+                        <button class="user-btn" id="userBtn">
+                            <img id="userAvatar" src="https://ui-avatars.com/api/?name=User&background=8B5CF6&color=fff&size=32" alt="Avatar" />
+                            <span id="userName">User</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="dropdown-menu" id="dropdownMenu">
+                            <a href="admin-dashboard.html"><i class="fas fa-chart-pie"></i> ড্যাশবোর্ড</a>
+                            <a href="admin-add-product.html"><i class="fas fa-plus-circle"></i> প্রোডাক্ট যোগ</a>
+                            <a href="admin-manage-products.html"><i class="fas fa-list"></i> প্রোডাক্ট লিস্ট</a>
+                            <a href="admin-categories.html"><i class="fas fa-folder"></i> ক্যাটাগরি</a>
+                            <!-- admin-dashboard.html - ড্রপডাউন মেনুতে -->
+<a href="admin-sliders.html"><i class="fas fa-images"></i> স্লাইডার</a>
+<a href="admin-banners.html"><i class="fas fa-flag"></i> ব্যানার</a>
+<a href="admin-offers.html"><i class="fas fa-tags"></i> অফার</a>
+<a href="admin-hero-cards.html"><i class="fas fa-id-card"></i> হিরো কার্ড</a>
+                            <a href="admin-orders.html"><i class="fas fa-box"></i> অর্ডার</a>
+                            <a href="admin-users.html"><i class="fas fa-users"></i> ইউজার</a>
+                            <hr />
+                            <a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> লগআউট</a>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- ===== DASHBOARD ===== -->
+    <section style="padding-top: 120px; padding-bottom: 60px;">
+        <div class="container">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 30px;">
+                <div>
+                    <span class="section-tag">অ্যাডমিন</span>
+                    <h2 style="font-family: 'Playfair Display', serif; font-size: 2.5rem; margin: 4px 0;">📊 ড্যাশবোর্ড</h2>
+                    <p style="color: var(--text-secondary);">আপনার ব্যবসার সার্বিক অবস্থা দেখুন</p>
+                </div>
+                <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                    <button onclick="refreshDashboard()" class="btn-outline-light">
+                        <i class="fas fa-sync"></i> রিফ্রেশ
+                    </button>
+                </div>
+            </div>
+
+            <!-- ===== STATS ===== -->
+            <div id="statsGrid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 20px; margin-bottom: 30px;"></div>
+
+            <!-- ===== CHARTS & ACTIVITY ===== -->
+            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 30px; margin-bottom: 30px;" class="dashboard-grid">
+                <!-- Revenue Chart -->
+                <div class="chart-container">
+                    <h3 style="margin-bottom: 16px;">📈 আয়ের প্রবণতা</h3>
+                    <canvas id="revenueChart"></canvas>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="chart-container">
+                    <h3 style="margin-bottom: 16px;">🔄 সাম্প্রতিক কার্যক্রম</h3>
+                    <div id="activityFeed" class="activity-feed">
+                        <div style="text-align:center;padding:20px;color:var(--text-secondary);">
+                            <i class="fas fa-spinner fa-spin"></i> লোড হচ্ছে...
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== QUICK ACTIONS (✅ অ্যাডমিন লগইন লিংক সহ) ===== -->
+            <div style="margin-bottom: 30px;">
+                <h3 style="margin-bottom: 16px;">🚀 কুইক অ্যাকশন</h3>
+                <div class="quick-action-grid">
+                    <a href="admin-add-product.html" class="quick-action-btn">
+                        <i class="fas fa-plus-circle"></i><span>প্রোডাক্ট যোগ</span>
+                    </a>
+                    <a href="admin-categories.html" class="quick-action-btn">
+                        <i class="fas fa-folder-plus"></i><span>ক্যাটাগরি যোগ</span>
+                    </a>
+                    <a href="admin-manage-products.html" class="quick-action-btn">
+                        <i class="fas fa-list"></i><span>প্রোডাক্ট লিস্ট</span>
+                    </a>
+                    <a href="admin-orders.html" class="quick-action-btn">
+                        <i class="fas fa-box"></i><span>অর্ডার ম্যানেজ</span>
+                    </a>
+                    <a href="admin-users.html" class="quick-action-btn">
+                        <i class="fas fa-users"></i><span>ইউজার লিস্ট</span>
+                    </a>
+                    <!-- ✅ অ্যাডমিন লগইন লিংক (হাইলাইটেড) -->
+                    <a href="admin-login.html" class="quick-action-btn admin-login-btn">
+                        <i class="fas fa-shield-alt"></i>
+                        <span>🔐 অ্যাডমিন লগইন</span>
+                    </a>
+                    <a href="products.html" class="quick-action-btn" target="_blank">
+                        <i class="fas fa-eye"></i><span>ওয়েবসাইট দেখুন</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- ===== RECENT ORDERS ===== -->
+            <div style="background: var(--dark-card); border-radius: var(--radius); padding: 24px; border: 1px solid var(--dark-border);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                    <h3>📋 সাম্প্রতিক অর্ডার</h3>
+                    <a href="admin-orders.html" style="color: var(--text-secondary); text-decoration: none; font-size: 14px;">সব দেখুন →</a>
+                </div>
+                <div id="recentOrders"><div style="text-align:center;padding:20px;color:var(--text-secondary);"><i class="fas fa-spinner fa-spin"></i> অর্ডার লোড হচ্ছে...</div></div>
+            </div>
+        </div>
+    </section>
+
+    <div id="toast" class="toast"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script type="module">
+        import { supabase } from './js/config.js';
+        import { checkAuth, updateAuthUI, setupDropdown, setupLogout } from './js/auth.js';
+        import { updateCartBadge } from './js/products.js';
+        import { isAdmin, getAllUsers } from './js/admin.js';
+
+        let revenueChart = null;
+
+        // ===== INIT =====
+        const user = await checkAuth();
+        updateAuthUI(user);
+        updateCartBadge();
+        setupDropdown();
+        setupLogout();
+
+        const admin = await isAdmin();
+        if (!admin) {
+            document.querySelector('section').innerHTML = `
+                <div style="text-align:center;padding:60px 0;">
+                    <i class="fas fa-shield-alt" style="font-size:3rem;color:#EF4444;display:block;margin-bottom:16px;"></i>
+                    <h2 style="color:#EF4444;">⛔ অ্যাক্সেস অস্বীকৃত</h2>
+                    <p style="color:var(--text-secondary);">শুধুমাত্র অ্যাডমিন ইউজার এই পেজ দেখতে পারেন।</p>
+                    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:16px;">
+                        <a href="index.html" class="btn-primary"><i class="fas fa-home"></i> হোমপেজে যান</a>
+                        <a href="admin-login.html" class="btn-outline-light" style="border-color:var(--primary);color:var(--primary);">
+                            <i class="fas fa-shield-alt"></i> অ্যাডমিন লগইন
+                        </a>
+                    </div>
+                </div>
+            `;
+        } else {
+            await loadDashboardData();
+        }
+
+        // ===== LOAD DASHBOARD DATA =====
+        async function loadDashboardData() {
+            try {
+                // Get counts
+                const [products, categories, orders] = await Promise.all([
+                    supabase.from('products').select('*', { count: 'exact', head: true }),
+                    supabase.from('categories').select('*', { count: 'exact', head: true }),
+                    supabase.from('orders').select('*', { count: 'exact', head: true })
+                ]);
+
+                // ✅ Get users using Service Role
+                const users = await getAllUsers();
+                const userCount = users.length;
+
+                // Get revenue data (last 7 days)
+                const revenueData = await getRevenueData();
+
+                // Get recent activity
+                await loadRecentActivity();
+
+                // Render stats
+                renderStats({
+                    products: products.count || 0,
+                    categories: categories.count || 0,
+                    orders: orders.count || 0,
+                    users: userCount,
+                    revenue: revenueData.total || 0
+                });
+
+                // Render chart
+                renderRevenueChart(revenueData.labels, revenueData.values);
+
+                // Load recent orders
+                await loadRecentOrders();
+
+            } catch (error) {
+                console.error('Error loading dashboard:', error);
+                showToast('ড্যাশবোর্ড লোড করতে ব্যর্থ!', 'error');
+            }
+        }
+
+        // ===== GET REVENUE DATA =====
+        async function getRevenueData() {
+            try {
+                const { data, error } = await supabase
+                    .from('orders')
+                    .select('total, created_at')
+                    .eq('status', 'delivered')
+                    .order('created_at', { ascending: true })
+                    .limit(30);
+
+                if (error) throw error;
+
+                const labels = [];
+                const values = [];
+                const today = new Date();
+                const days = 7;
+
+                // Group by date
+                const dateMap = {};
+                data?.forEach(order => {
+                    const date = new Date(order.created_at).toLocaleDateString('en-CA');
+                    dateMap[date] = (dateMap[date] || 0) + order.total;
+                });
+
+                // Fill last 7 days
+                for (let i = days - 1; i >= 0; i--) {
+                    const d = new Date(today);
+                    d.setDate(d.getDate() - i);
+                    const key = d.toLocaleDateString('en-CA');
+                    labels.push(d.toLocaleDateString('bn-BD', { month: 'short', day: 'numeric' }));
+                    values.push(dateMap[key] || 0);
+                }
+
+                return {
+                    labels,
+                    values,
+                    total: Object.values(dateMap).reduce((a, b) => a + b, 0)
+                };
+
+            } catch (error) {
+                console.error('Error getting revenue data:', error);
+                return { labels: [], values: [], total: 0 };
+            }
+        }
+
+        // ===== RENDER STATS =====
+        function renderStats(counts) {
+            const grid = document.getElementById('statsGrid');
+            const stats = [
+                { icon: 'fa-box', number: counts.products, label: 'প্রোডাক্ট', color: 'color-purple', trend: '', trendUp: true },
+                { icon: 'fa-folder', number: counts.categories, label: 'ক্যাটাগরি', color: 'color-green', trend: '', trendUp: true },
+                { icon: 'fa-shopping-bag', number: counts.orders, label: 'অর্ডার', color: 'color-blue', trend: '', trendUp: true },
+                { icon: 'fa-users', number: counts.users, label: 'ইউজার', color: 'color-orange', trend: '', trendUp: true },
+                { icon: 'fa-coins', number: `৳${counts.revenue.toFixed(0)}`, label: 'আয় (সর্বমোট)', color: 'color-pink', trend: '', trendUp: true }
+            ];
+
+            grid.innerHTML = stats.map(s => `
+                <div class="stat-card ${s.color}">
+                    <div class="icon"><i class="fas ${s.icon}"></i></div>
+                    <span class="number">${s.number}</span>
+                    <span class="label">${s.label}</span>
+                    ${s.trend ? `<span class="trend ${s.trendUp ? 'up' : 'down'}"><i class="fas fa-arrow-${s.trendUp ? 'up' : 'down'}"></i> ${s.trend}</span>` : ''}
+                </div>
+            `).join('');
+        }
+
+        // ===== RENDER REVENUE CHART =====
+        function renderRevenueChart(labels, values) {
+            const ctx = document.getElementById('revenueChart').getContext('2d');
+
+            if (revenueChart) {
+                revenueChart.destroy();
+            }
+
+            revenueChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'আয় (৳)',
+                        data: values,
+                        borderColor: '#8B5CF6',
+                        backgroundColor: 'rgba(139, 92, 246, 0.1)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: '#8B5CF6',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                        pointRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: { color: '#A0A0A0' }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                color: '#A0A0A0',
+                                callback: function(value) { return '৳' + value; }
+                            },
+                            grid: { color: 'rgba(255,255,255,0.05)' }
+                        },
+                        x: {
+                            ticks: { color: '#A0A0A0' },
+                            grid: { color: 'rgba(255,255,255,0.05)' }
+                        }
+                    }
+                }
+            });
+        }
+
+        // ===== LOAD RECENT ACTIVITY =====
+        async function loadRecentActivity() {
+            const container = document.getElementById('activityFeed');
+
+            try {
+                const activities = [];
+
+                // Get recent orders
+                const { data: recentOrders } = await supabase
+                    .from('orders')
+                    .select('*')
+                    .order('created_at', { ascending: false })
+                    .limit(5);
+
+                if (recentOrders) {
+                    recentOrders.forEach(order => {
+                        activities.push({
+                            icon: 'fa-shopping-bag',
+                            bg: 'bg-blue',
+                            text: `<span class="title">নতুন অর্ডার #${order.order_number}</span>`,
+                            time: new Date(order.created_at).toLocaleString('bn-BD'),
+                            timeAgo: timeAgo(order.created_at)
+                        });
+                    });
+                }
+
+                // Get recent products
+                const { data: recentProducts } = await supabase
+                    .from('products')
+                    .select('*')
+                    .order('created_at', { ascending: false })
+                    .limit(3);
+
+                if (recentProducts) {
+                    recentProducts.forEach(product => {
+                        activities.push({
+                            icon: 'fa-box',
+                            bg: 'bg-purple',
+                            text: `<span class="title">নতুন প্রোডাক্ট: ${product.name}</span>`,
+                            time: new Date(product.created_at).toLocaleString('bn-BD'),
+                            timeAgo: timeAgo(product.created_at)
+                        });
+                    });
+                }
+
+                // Sort by time (newest first)
+                activities.sort((a, b) => new Date(b.time) - new Date(a.time));
+
+                if (activities.length === 0) {
+                    container.innerHTML = `
+                        <div style="text-align:center;padding:20px;color:var(--text-secondary);">
+                            <i class="fas fa-inbox" style="font-size:2rem;display:block;margin-bottom:8px;"></i>
+                            <p>কোনো কার্যক্রম নেই</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                container.innerHTML = activities.slice(0, 10).map(act => `
+                    <div class="activity-item">
+                        <div class="activity-icon ${act.bg}">
+                            <i class="fas ${act.icon}"></i>
+                        </div>
+                        <div class="activity-text">
+                            <div>${act.text}</div>
+                            <span class="time">${act.timeAgo}</span>
+                        </div>
+                    </div>
+                `).join('');
+
+            } catch (error) {
+                console.error('Error loading activity:', error);
+                container.innerHTML = `
+                    <div style="text-align:center;padding:20px;color:#EF4444;">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <p>অ্যাক্টিভিটি লোড করতে ব্যর্থ!</p>
+                    </div>
+                `;
+            }
+        }
+
+        // ===== TIME AGO FUNCTION =====
+        function timeAgo(date) {
+            const now = new Date();
+            const diff = (now - new Date(date)) / 1000;
+            if (diff < 60) return 'এইমাত্র';
+            if (diff < 3600) return Math.floor(diff / 60) + ' মিনিট আগে';
+            if (diff < 86400) return Math.floor(diff / 3600) + ' ঘন্টা আগে';
+            if (diff < 604800) return Math.floor(diff / 86400) + ' দিন আগে';
+            return new Date(date).toLocaleDateString('bn-BD');
+        }
+
+        // ===== LOAD RECENT ORDERS =====
+        async function loadRecentOrders() {
+            const container = document.getElementById('recentOrders');
+
+            try {
+                const { data, error } = await supabase
+                    .from('orders')
+                    .select('*')
+                    .order('created_at', { ascending: false })
+                    .limit(5);
+
+                if (error) throw error;
+
+                if (!data || data.length === 0) {
+                    container.innerHTML = `
+                        <div style="text-align:center;padding:20px;color:var(--text-secondary);">
+                            <i class="fas fa-inbox" style="font-size:2rem;display:block;margin-bottom:8px;"></i>
+                            <p>কোনো অর্ডার নেই</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                container.innerHTML = `
+                    <table class="recent-orders-table">
+                        <thead>
+                            <tr>
+                                <th>অর্ডার #</th>
+                                <th>গ্রাহক</th>
+                                <th>মোট</th>
+                                <th>স্ট্যাটাস</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${data.map(o => `
+                                <tr>
+                                    <td><a href="admin-orders.html" style="color:var(--primary);text-decoration:none;">#${o.order_number}</a></td>
+                                    <td>${o.shipping_name}</td>
+                                    <td>৳${o.total.toFixed(2)}</td>
+                                    <td><span class="status-badge status-${o.status}">${getStatusText(o.status)}</span></td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                `;
+
+            } catch (error) {
+                console.error('Error loading recent orders:', error);
+                container.innerHTML = `
+                    <div style="text-align:center;padding:20px;color:#EF4444;">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <p>অর্ডার লোড করতে ব্যর্থ!</p>
+                    </div>
+                `;
+            }
+        }
+
+        // ===== GET STATUS TEXT =====
+        function getStatusText(status) {
+            const texts = {
+                'pending': '⏳ পেন্ডিং',
+                'processing': '🔄 প্রসেসিং',
+                'shipped': '🚚 শিপ্পিং',
+                'delivered': '✅ ডেলিভারি',
+                'cancelled': '❌ ক্যান্সেল'
+            };
+            return texts[status] || status;
+        }
+
+        // ===== REFRESH DASHBOARD =====
+        window.refreshDashboard = async function() {
+            showToast('ড্যাশবোর্ড রিফ্রেশ হচ্ছে...', 'info');
+            await loadDashboardData();
+            showToast('✅ ড্যাশবোর্ড রিফ্রেশ হয়েছে!', 'success');
+        };
+
+        // ===== TOAST =====
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast show ${type}`;
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+    </script>
+</body>
+</html>

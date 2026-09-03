@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>প্রোডাক্ট ডিটেইলস - রূপকথা</title>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.5.1/css/all.css" />
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/dark-theme.css" />
+    <link rel="stylesheet" href="css/responsive.css" />
+</head>
+<body>
+    <!-- ===== NAVIGATION ===== -->
+    <nav class="navbar" id="mainNav">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo">
+                <i class="fas fa-spa"></i>
+                <span>রূপকথা</span>
+                <small>Beauty</small>
+            </a>
+            <button class="nav-toggle" id="navToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="index.html">হোম</a></li>
+                <li><a href="products.html">প্রোডাক্ট</a></li>
+                <li><a href="cart.html">কার্ট <span class="cart-badge" id="cartBadge">0</span></a></li>
+                <li class="auth-links" id="authLinks">
+                    <a href="login.html" class="btn-outline-light">লগইন</a>
+                    <a href="register.html" class="btn-primary">রেজিস্টার</a>
+                </li>
+                <li class="user-menu" id="userMenu" style="display:none;">
+                    <div class="user-dropdown">
+                        <button class="user-btn" id="userBtn">
+                            <img id="userAvatar" src="https://ui-avatars.com/api/?name=User&background=8B5CF6&color=fff&size=32" alt="Avatar" />
+                            <span id="userName">User</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="dropdown-menu" id="dropdownMenu">
+                            <a href="profile.html">প্রোফাইল</a>
+                            <a href="orders.html">অর্ডার</a>
+                            <a href="admin-add-product.html" id="adminLink" style="display:none;">📦 অ্যাডমিন</a>
+                            <hr />
+                            <a href="#" id="logoutBtn">লগআউট</a>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- ===== PRODUCT DETAILS ===== -->
+    <section style="padding-top: 120px; padding-bottom: 60px;">
+        <div class="container">
+            <div id="loadingSpinner" style="text-align: center; padding: 60px 0;">
+                <i class="fas fa-spinner fa-spin" style="font-size: 3rem; color: var(--primary);"></i>
+                <p style="color: var(--text-secondary); margin-top: 16px;">প্রোডাক্ট লোড হচ্ছে...</p>
+            </div>
+
+            <div id="productContent" style="display: none;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: start;">
+                    <div style="background: var(--dark-card); border-radius: var(--radius); padding: 20px; border: 1px solid var(--dark-border);">
+                        <img id="detailImage" 
+                             src="" 
+                             alt="Product Image" 
+                             style="width: 100%; height: auto; border-radius: 8px;"
+                             onerror="this.src='https://res.cloudinary.com/demo/image/upload/sample.jpg'; this.onerror=null;" />
+                    </div>
+                    <div>
+                        <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+                            <span id="detailCategory" style="background: rgba(139, 92, 246, 0.2); color: var(--primary); padding: 4px 16px; border-radius: 50px; font-size: 14px; font-weight: 600;"></span>
+                            <span id="detailStock" style="padding: 4px 16px; border-radius: 50px; font-size: 14px; font-weight: 600;"></span>
+                        </div>
+                        <h1 id="detailName" style="font-family: 'Playfair Display', serif; font-size: 2.5rem; margin: 16px 0;"></h1>
+                        <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 16px;">
+                            <span id="detailPrice" style="font-size: 2rem; font-weight: 700; color: var(--primary);"></span>
+                        </div>
+                        <p id="detailDescription" style="color: var(--text-secondary); line-height: 1.8; font-size: 1.1rem; margin-bottom: 24px;"></p>
+                        <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 24px;">
+                            <label style="font-weight: 600;">পরিমাণ:</label>
+                            <div style="display: flex; align-items: center; gap: 12px; background: var(--dark); border-radius: 8px; padding: 4px; border: 1px solid var(--dark-border);">
+                                <button onclick="updateQuantity(-1)" style="background: none; border: none; color: white; padding: 8px 16px; cursor: pointer; font-size: 1.2rem;">
+                                    <i class="fas fa-minus"></i>
+                                </button>
+                                <span id="quantityDisplay" style="min-width: 40px; text-align: center; font-size: 1.2rem; font-weight: 600;">1</span>
+                                <button onclick="updateQuantity(1)" style="background: none; border: none; color: white; padding: 8px 16px; cursor: pointer; font-size: 1.2rem;">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                            <button onclick="addToCart()" class="btn-primary" style="flex: 1; padding: 16px 32px; font-size: 1.1rem; justify-content: center;">
+                                <i class="fas fa-shopping-bag"></i> কার্টে যোগ করুন
+                            </button>
+                            <button onclick="buyNow()" class="btn-hero-primary" style="flex: 1; padding: 16px 32px; font-size: 1.1rem; justify-content: center; background: linear-gradient(135deg, #10B981, #059669);">
+                                <i class="fas fa-bolt"></i> এখনই কিনুন
+                            </button>
+                        </div>
+                        <div style="margin-top: 24px;">
+                            <a href="products.html" style="color: var(--text-secondary); text-decoration: none; display: inline-flex; align-items: center; gap: 8px; transition: var(--transition);">
+                                <i class="fas fa-arrow-left"></i> প্রোডাক্ট লিস্টে ফিরে যান
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="errorMessage" style="display: none; text-align: center; padding: 60px 0;">
+                <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #EF4444;"></i>
+                <h3 style="margin: 16px 0; color: #EF4444;">প্রোডাক্ট পাওয়া যায়নি!</h3>
+                <a href="products.html" class="btn-primary" style="display: inline-block; margin-top: 20px;">
+                    <i class="fas fa-arrow-left"></i> প্রোডাক্ট লিস্টে যান
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <div id="toast" class="toast"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script type="module">
+        import { supabase } from './js/config.js';
+        import { checkAuth, updateAuthUI } from './js/auth.js';
+        import { updateCartBadge, addToCart } from './js/products.js';
+
+        let currentProduct = null;
+        let currentQuantity = 1;
+
+        const user = await checkAuth();
+        updateAuthUI(user);
+        updateCartBadge();
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const productId = urlParams.get('id');
+
+        if (!productId) {
+            document.getElementById('loadingSpinner').style.display = 'none';
+            document.getElementById('errorMessage').style.display = 'block';
+        } else {
+            loadProductDetails(productId);
+        }
+
+        async function loadProductDetails(id) {
+            try {
+                const { data, error } = await supabase
+                    .from('products')
+                    .select('*')
+                    .eq('id', id)
+                    .single();
+
+                if (error || !data) throw new Error('প্রোডাক্ট পাওয়া যায়নি');
+
+                currentProduct = data;
+                displayProduct(data);
+                
+                document.getElementById('loadingSpinner').style.display = 'none';
+                document.getElementById('productContent').style.display = 'block';
+
+            } catch (error) {
+                console.error('Error loading product:', error);
+                document.getElementById('loadingSpinner').style.display = 'none';
+                document.getElementById('errorMessage').style.display = 'block';
+            }
+        }
+
+        function displayProduct(product) {
+            // ✅ ইমেজ URL ঠিক করা
+            let imageUrl = product.image_url;
+            const DEFAULT_IMG = 'https://res.cloudinary.com/demo/image/upload/sample.jpg';
+            
+            if (!imageUrl || imageUrl === '' || imageUrl.includes('via.placeholder.com') || imageUrl.includes('beauty.jpg')) {
+                imageUrl = DEFAULT_IMG;
+            }
+            
+            const img = document.getElementById('detailImage');
+            img.src = imageUrl;
+            img.alt = product.name;
+            img.onerror = function() {
+                this.src = DEFAULT_IMG;
+                this.onerror = null;
+            };
+
+            document.getElementById('detailName').textContent = product.name;
+            document.getElementById('detailCategory').textContent = product.category;
+            document.getElementById('detailPrice').textContent = `৳${product.price.toFixed(2)}`;
+            document.getElementById('detailDescription').textContent = product.description;
+
+            const stockSpan = document.getElementById('detailStock');
+            if (product.stock > 0) {
+                stockSpan.innerHTML = `<i class="fas fa-check-circle"></i> স্টকে আছে (${product.stock} টি)`;
+                stockSpan.style.background = 'rgba(16, 185, 129, 0.2)';
+                stockSpan.style.color = '#10B981';
+            } else {
+                stockSpan.innerHTML = `<i class="fas fa-times-circle"></i> স্টক শেষ`;
+                stockSpan.style.background = 'rgba(239, 68, 68, 0.2)';
+                stockSpan.style.color = '#EF4444';
+            }
+        }
+
+        window.updateQuantity = function(change) {
+            if (!currentProduct) return;
+            const newQty = currentQuantity + change;
+            if (newQty < 1) return;
+            if (newQty > currentProduct.stock) {
+                showToast('স্টকে যতটুকু আছে তার বেশি নিতে পারবেন না!', 'error');
+                return;
+            }
+            currentQuantity = newQty;
+            document.getElementById('quantityDisplay').textContent = currentQuantity;
+        };
+
+        window.addToCart = function() {
+            if (!currentProduct) return;
+            if (currentProduct.stock <= 0) {
+                showToast('প্রোডাক্টটি স্টকে নেই!', 'error');
+                return;
+            }
+            addToCart(currentProduct.id, currentQuantity);
+        };
+
+        window.buyNow = function() {
+            if (!currentProduct) return;
+            if (currentProduct.stock <= 0) {
+                showToast('প্রোডাক্টটি স্টকে নেই!', 'error');
+                return;
+            }
+            addToCart(currentProduct.id, currentQuantity);
+            showToast('প্রোডাক্ট কার্টে যোগ হয়েছে! চেকআউট পেজে যাচ্ছি...', 'success');
+            setTimeout(() => {
+                window.location.href = 'checkout.html';
+            }, 1000);
+        };
+
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast show ${type}`;
+            if (window.toastTimeout) clearTimeout(window.toastTimeout);
+            window.toastTimeout = setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        window.showToast = showToast;
+    </script>
+</body>
+</html>

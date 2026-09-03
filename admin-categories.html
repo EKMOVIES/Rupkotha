@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ক্যাটাগরি ম্যানেজ - রূপকথা</title>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.5.1/css/all.css" />
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/dark-theme.css" />
+    <link rel="stylesheet" href="css/responsive.css" />
+</head>
+<body>
+    <!-- ===== NAVIGATION ===== -->
+    <nav class="navbar" id="mainNav">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo">
+                <i class="fas fa-spa"></i>
+                <span>রূপকথা</span>
+                <small>Beauty</small>
+            </a>
+            <button class="nav-toggle" id="navToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="index.html">হোম</a></li>
+                <li><a href="products.html">প্রোডাক্ট</a></li>
+                <li><a href="cart.html">কার্ট <span class="cart-badge" id="cartBadge">0</span></a></li>
+                <li class="auth-links" id="authLinks">
+                    <a href="login.html" class="btn-outline-light">লগইন</a>
+                    <a href="register.html" class="btn-primary">রেজিস্টার</a>
+                </li>
+                <li class="user-menu" id="userMenu" style="display:none;">
+                    <div class="user-dropdown">
+                        <button class="user-btn" id="userBtn">
+                            <img id="userAvatar" src="https://ui-avatars.com/api/?name=User&background=8B5CF6&color=fff&size=32" alt="Avatar" />
+                            <span id="userName">User</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="dropdown-menu" id="dropdownMenu">
+                            <a href="admin-dashboard.html">📊 ড্যাশবোর্ড</a>
+                            <a href="admin-add-product.html">📦 প্রোডাক্ট যোগ</a>
+                            <a href="admin-manage-products.html">📋 প্রোডাক্ট লিস্ট</a>
+                            <a href="admin-categories.html">📂 ক্যাটাগরি</a>
+                            <a href="admin-orders.html">📋 অর্ডার</a>
+                            <hr />
+                            <a href="#" id="logoutBtn">লগআউট</a>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- ===== CATEGORY MANAGEMENT ===== -->
+    <section style="padding-top: 120px; padding-bottom: 60px;">
+        <div class="container">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 30px;">
+                <div>
+                    <span class="section-tag">অ্যাডমিন</span>
+                    <h2 style="font-family: 'Playfair Display', serif; font-size: 2.5rem;">📂 ক্যাটাগরি ম্যানেজ</h2>
+                    <p style="color: var(--text-secondary);">ক্যাটাগরি যোগ, এডিট ও ডিলিট করুন</p>
+                </div>
+                <button onclick="showAddCategoryModal()" class="btn-primary"><i class="fas fa-plus"></i> নতুন ক্যাটাগরি</button>
+            </div>
+
+            <div id="categoryList" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px;"></div>
+        </div>
+    </section>
+
+    <!-- ===== MODAL ===== -->
+    <div id="categoryModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 9999; align-items: center; justify-content: center;">
+        <div style="background: var(--dark-card); border-radius: var(--radius); padding: 30px; max-width: 500px; width: 90%; border: 1px solid var(--dark-border);">
+            <h3 id="modalTitle" style="margin-bottom: 20px;">📂 নতুন ক্যাটাগরি</h3>
+            <form id="categoryForm">
+                <input type="hidden" id="categoryId" />
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; margin-bottom: 6px; font-weight: 500;">ক্যাটাগরির নাম *</label>
+                    <input type="text" id="categoryName" required style="width:100%;padding:12px;background:var(--dark);border:1px solid var(--dark-border);border-radius:8px;color:white;" />
+                </div>
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; margin-bottom: 6px; font-weight: 500;">আইকন (FontAwesome ক্লাস)</label>
+                    <input type="text" id="categoryIcon" placeholder="fas fa-palette" style="width:100%;padding:12px;background:var(--dark);border:1px solid var(--dark-border);border-radius:8px;color:white;" />
+                </div>
+                <div style="display: flex; gap: 12px;">
+                    <button type="submit" class="btn-primary" style="flex:1;"><i class="fas fa-save"></i> সংরক্ষণ করুন</button>
+                    <button type="button" onclick="closeModal()" class="btn-outline-light" style="flex:0.5;">বাতিল</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script type="module">
+        import { supabase, supabaseAdmin } from './js/config.js';
+        import { checkAuth, updateAuthUI, setupDropdown, setupLogout } from './js/auth.js';
+        import { updateCartBadge } from './js/products.js';
+        import { isAdmin } from './js/admin.js';
+
+        const user = await checkAuth();
+        updateAuthUI(user);
+        updateCartBadge();
+        setupDropdown();
+        setupLogout();
+
+        const admin = await isAdmin();
+        if (!admin) {
+            document.querySelector('section').innerHTML = `<div style="text-align:center;padding:60px 0;"><h2 style="color:#EF4444;">⛔ অ্যাক্সেস অস্বীকৃত</h2><p style="color:var(--text-secondary);">শুধুমাত্র অ্যাডমিন ইউজার এই পেজ দেখতে পারেন।</p></div>`;
+        } else {
+            loadCategories();
+        }
+
+        async function loadCategories() {
+            const container = document.getElementById('categoryList');
+            try {
+                const { data, error } = await supabase.from('categories').select('*').order('name');
+                if (error) throw error;
+                if (!data || data.length === 0) {
+                    container.innerHTML = `<div style="text-align:center;padding:40px;grid-column:1/-1;color:var(--text-secondary);"><i class="fas fa-folder-open" style="font-size:3rem;display:block;margin-bottom:12px;"></i><p>কোনো ক্যাটাগরি নেই</p><button onclick="showAddCategoryModal()" class="btn-primary" style="margin-top:12px;"><i class="fas fa-plus"></i> প্রথম ক্যাটাগরি যোগ করুন</button></div>`;
+                    return;
+                }
+                container.innerHTML = data.map(cat => `
+                    <div style="background:var(--dark-card);border-radius:var(--radius);padding:20px;border:1px solid var(--dark-border);text-align:center;transition:var(--transition);">
+                        <i class="${cat.icon || 'fas fa-palette'}" style="font-size:2.5rem;color:var(--primary);display:block;margin-bottom:8px;"></i>
+                        <h3 style="margin-bottom:4px;">${cat.name}</h3>
+                        <p style="color:var(--text-secondary);font-size:14px;margin-bottom:12px;">${cat.description || ''}</p>
+                        <div style="display:flex;gap:8px;justify-content:center;">
+                            <button onclick="editCategory('${cat.id}')" class="btn-primary" style="padding:6px 16px;font-size:13px;"><i class="fas fa-edit"></i> এডিট</button>
+                            <button onclick="deleteCategory('${cat.id}')" class="btn-outline-light" style="padding:6px 16px;font-size:13px;border-color:#EF4444;color:#EF4444;"><i class="fas fa-trash"></i> ডিলিট</button>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading categories:', error);
+                container.innerHTML = `<p style="color:#EF4444;">ক্যাটাগরি লোড করতে ব্যর্থ!</p>`;
+            }
+        }
+
+        window.showAddCategoryModal = function() {
+            document.getElementById('modalTitle').textContent = '📂 নতুন ক্যাটাগরি';
+            document.getElementById('categoryId').value = '';
+            document.getElementById('categoryName').value = '';
+            document.getElementById('categoryIcon').value = 'fas fa-palette';
+            document.getElementById('categoryModal').style.display = 'flex';
+        };
+
+        window.editCategory = async function(id) {
+            try {
+                const { data, error } = await supabase.from('categories').select('*').eq('id', id).single();
+                if (error) throw error;
+                document.getElementById('modalTitle').textContent = '✏️ ক্যাটাগরি এডিট';
+                document.getElementById('categoryId').value = data.id;
+                document.getElementById('categoryName').value = data.name;
+                document.getElementById('categoryIcon').value = data.icon || 'fas fa-palette';
+                document.getElementById('categoryModal').style.display = 'flex';
+            } catch (error) {
+                showToast('ক্যাটাগরি লোড করতে ব্যর্থ!', 'error');
+            }
+        };
+
+        window.closeModal = function() {
+            document.getElementById('categoryModal').style.display = 'none';
+        };
+
+        document.getElementById('categoryForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('categoryId').value;
+            const name = document.getElementById('categoryName').value.trim();
+            const icon = document.getElementById('categoryIcon').value.trim();
+            if (!name) { showToast('দয়া করে ক্যাটাগরির নাম দিন!', 'error'); return; }
+            try {
+                if (id) {
+                    await supabaseAdmin.from('categories').update({ name, icon }).eq('id', id);
+                    showToast('✅ ক্যাটাগরি আপডেট করা হয়েছে!', 'success');
+                } else {
+                    await supabaseAdmin.from('categories').insert([{ name, icon }]);
+                    showToast('✅ নতুন ক্যাটাগরি যোগ করা হয়েছে!', 'success');
+                }
+                closeModal();
+                loadCategories();
+            } catch (error) {
+                console.error('Error saving category:', error);
+                showToast('❌ ' + error.message, 'error');
+            }
+        });
+
+        window.deleteCategory = async function(id) {
+            if (!confirm('আপনি কি এই ক্যাটাগরি ডিলিট করতে চান?')) return;
+            try {
+                await supabaseAdmin.from('categories').delete().eq('id', id);
+                showToast('✅ ক্যাটাগরি ডিলিট করা হয়েছে!', 'success');
+                loadCategories();
+            } catch (error) {
+                console.error('Error deleting category:', error);
+                showToast('❌ ' + error.message, 'error');
+            }
+        };
+
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast show ${type}`;
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+    </script>
+</body>
+</html>

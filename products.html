@@ -1,16 +1,155 @@
 <!DOCTYPE html>
 <html lang="bn">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>প্রোডাক্টস - রূপকথা</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>সব প্রোডাক্ট - রূপকথা</title>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.5.1/css/all.css" />
     <link rel="stylesheet" href="css/style.css" />
     <link rel="stylesheet" href="css/dark-theme.css" />
     <link rel="stylesheet" href="css/responsive.css" />
+    <style>
+        /* ===== FILTER BAR ===== */
+        .filter-bar {
+            background: var(--dark-card);
+            border: 1px solid var(--dark-border);
+            border-radius: var(--radius);
+            padding: 20px;
+            margin-bottom: 30px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            align-items: center;
+        }
+        .filter-bar .search-box {
+            flex: 2;
+            min-width: 200px;
+            position: relative;
+        }
+        .filter-bar .search-box input {
+            width: 100%;
+            padding: 12px 16px 12px 44px;
+            background: var(--dark);
+            border: 1px solid var(--dark-border);
+            border-radius: 8px;
+            color: white;
+            font-size: 16px;
+            transition: var(--transition);
+        }
+        .filter-bar .search-box input:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
+        }
+        .filter-bar .search-box i {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+        }
+        .filter-bar select,
+        .filter-bar input[type="number"] {
+            padding: 10px 16px;
+            background: var(--dark);
+            border: 1px solid var(--dark-border);
+            border-radius: 8px;
+            color: white;
+            font-size: 14px;
+            min-width: 120px;
+            transition: var(--transition);
+        }
+        .filter-bar select:focus,
+        .filter-bar input[type="number"]:focus {
+            border-color: var(--primary);
+            outline: none;
+        }
+        .filter-bar .price-range {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .filter-bar .price-range input {
+            width: 80px;
+        }
+        .filter-bar .clear-btn {
+            padding: 8px 16px;
+            background: transparent;
+            border: 1px solid #EF4444;
+            color: #EF4444;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 14px;
+        }
+        .filter-bar .clear-btn:hover {
+            background: #EF4444;
+            color: white;
+        }
+
+        .filter-bar .filter-label {
+            color: var(--text-secondary);
+            font-size: 13px;
+            font-weight: 500;
+            margin-right: 4px;
+        }
+
+        /* ===== CATEGORY FILTER BUTTONS ===== */
+        .category-filter {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 24px;
+        }
+        .category-filter .filter-btn {
+            padding: 8px 20px;
+            background: var(--dark-card);
+            border: 1px solid var(--dark-border);
+            border-radius: 50px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 14px;
+        }
+        .category-filter .filter-btn:hover {
+            border-color: var(--primary);
+            color: white;
+        }
+        .category-filter .filter-btn.active {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-color: var(--primary);
+            color: white;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+        }
+
+        /* ===== PRODUCT COUNT ===== */
+        .product-count {
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-bottom: 16px;
+        }
+        .product-count strong {
+            color: white;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .filter-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .filter-bar .price-range {
+                flex-wrap: wrap;
+            }
+            .filter-bar .price-range input {
+                width: 100%;
+            }
+        }
+    </style>
 </head>
 <body>
-    <!-- Navigation -->
+
+    <!-- ===== NAVIGATION ===== -->
     <nav class="navbar" id="mainNav">
         <div class="nav-container">
             <a href="index.html" class="nav-logo">
@@ -24,9 +163,10 @@
             <ul class="nav-menu" id="navMenu">
                 <li><a href="index.html">হোম</a></li>
                 <li><a href="products.html" class="active">প্রোডাক্ট</a></li>
-                <li><a href="blog.html">ব্লগ</a></li>
-                <a href="admin-manage-products.html">📋 প্রোডাক্ট লিস্ট</a>
                 <li><a href="cart.html">কার্ট <span class="cart-badge" id="cartBadge">0</span></a></li>
+                <li><a href="admin-login.html" class="btn-outline-light" style="border-color: var(--primary); color: var(--primary);">
+                    <i class="fas fa-shield-alt"></i> অ্যাডমিন
+                </a></li>
                 <li class="auth-links" id="authLinks">
                     <a href="login.html" class="btn-outline-light">লগইন</a>
                     <a href="register.html" class="btn-primary">রেজিস্টার</a>
@@ -39,9 +179,9 @@
                             <i class="fas fa-chevron-down"></i>
                         </button>
                         <div class="dropdown-menu" id="dropdownMenu">
+                            <a href="admin-dashboard.html" id="adminLink" style="display:none;">📊 ড্যাশবোর্ড</a>
                             <a href="profile.html">প্রোফাইল</a>
                             <a href="orders.html">অর্ডার</a>
-                            <a href="admin.html" id="adminLink" style="display:none;">অ্যাডমিন</a>
                             <hr />
                             <a href="#" id="logoutBtn">লগআউট</a>
                         </div>
@@ -51,21 +191,80 @@
         </div>
     </nav>
 
-    <!-- Products Section -->
-    <section class="featured" style="padding-top: 120px;">
+    <!-- ===== PRODUCTS SECTION ===== -->
+    <section style="padding-top: 120px; padding-bottom: 60px;">
         <div class="container">
             <div class="section-header">
                 <span class="section-tag">আমাদের কালেকশন</span>
                 <h2>সব <span class="highlight">প্রোডাক্ট</span></h2>
                 <p>আমাদের সকল মেকআপ প্রোডাক্ট এক জায়গায়</p>
             </div>
-            <div class="product-grid" id="allProductsGrid">
-                <!-- Products will be loaded here -->
+
+            <!-- ===== FILTER BAR ===== -->
+            <div class="filter-bar">
+                <!-- Search -->
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchInput" placeholder="🔍 প্রোডাক্ট খুঁজুন..." />
+                </div>
+
+                <!-- Category Filter -->
+                <select id="categoryFilter">
+                    <option value="all">সব ক্যাটাগরি</option>
+                    <!-- Categories will be loaded here -->
+                </select>
+
+                <!-- Price Range -->
+                <div class="price-range">
+                    <span class="filter-label">দাম:</span>
+                    <input type="number" id="minPrice" placeholder="মিন" min="0" />
+                    <span>–</span>
+                    <input type="number" id="maxPrice" placeholder="ম্যাক্স" min="0" />
+                </div>
+
+                <!-- Sort -->
+                <select id="sortFilter">
+                    <option value="newest">সর্বশেষ</option>
+                    <option value="price-low">দাম (কম→বেশি)</option>
+                    <option value="price-high">দাম (বেশি→কম)</option>
+                    <option value="name">নাম (আ-জ)</option>
+                </select>
+
+                <!-- Clear -->
+                <button class="clear-btn" id="clearFilters">
+                    <i class="fas fa-times"></i> রিসেট
+                </button>
+            </div>
+
+            <!-- ===== CATEGORY FILTER BUTTONS ===== -->
+            <div class="category-filter" id="categoryFilterButtons">
+                <button class="filter-btn active" data-category="all">সব</button>
+            </div>
+
+            <!-- ===== PRODUCT COUNT ===== -->
+            <div class="product-count" id="productCount">
+                <strong id="countNumber">0</strong> টি প্রোডাক্ট পাওয়া গেছে
+            </div>
+
+            <!-- ===== LOADING ===== -->
+            <div id="loadingSpinner" style="text-align: center; padding: 60px 0;">
+                <i class="fas fa-spinner fa-spin" style="font-size: 3rem; color: var(--primary);"></i>
+                <p style="color: var(--text-secondary); margin-top: 16px;">প্রোডাক্ট লোড হচ্ছে...</p>
+            </div>
+
+            <!-- ===== PRODUCT GRID ===== -->
+            <div class="product-grid" id="allProductsGrid"></div>
+
+            <!-- ===== NO PRODUCTS ===== -->
+            <div id="noProducts" style="display: none; text-align: center; padding: 60px 0;">
+                <i class="fas fa-box-open" style="font-size: 3rem; color: var(--text-secondary);"></i>
+                <h3 style="color: var(--text-secondary); margin-top: 16px;">কোনো প্রোডাক্ট পাওয়া যায়নি</h3>
+                <p style="color: var(--text-secondary);">আপনার ফিল্টার পরিবর্তন করে আবার চেষ্টা করুন।</p>
             </div>
         </div>
     </section>
 
-    <!-- Footer -->
+    <!-- ===== FOOTER ===== -->
     <footer class="footer">
         <div class="container">
             <div class="footer-grid">
@@ -81,8 +280,7 @@
                     <h4>কুইক লিংক</h4>
                     <ul>
                         <li><a href="products.html">প্রোডাক্ট</a></li>
-                        <li><a href="blog.html">ব্লগ</a></li>
-                        <li><a href="about.html">আমাদের সম্পর্কে</a></li>
+                        <li><a href="cart.html">কার্ট</a></li>
                     </ul>
                 </div>
                 <div class="footer-contact">
@@ -97,31 +295,273 @@
         </div>
     </footer>
 
+    <!-- ===== TOAST ===== -->
     <div id="toast" class="toast"></div>
 
-    <!-- Scripts -->
+    <!-- ===== SCRIPTS ===== -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script type="module">
+        // ===== IMPORTS =====
         import { supabase } from './js/config.js';
-        import { renderProducts, updateCartBadge } from './js/products.js';
-        import { checkAuth, updateAuthUI } from './js/auth.js';
+        import { checkAuth, updateAuthUI, setupDropdown, setupLogout } from './js/auth.js';
+        import { updateCartBadge, addToCart, viewProduct, renderProducts, getProductImage } from './js/products.js';
+        import { syncLocalCartToDB } from './js/cart.js';
 
-        // Initialize
-        async function init() {
-            const user = await checkAuth();
-            updateAuthUI(user);
-            updateCartBadge();
-            
-            // Load all products
-            const { data: products } = await supabase
-                .from('products')
-                .select('*')
-                .order('created_at', { ascending: false });
-            
-            renderProducts(products || [], 'allProductsGrid');
+        // ===== STATE =====
+        let allProducts = [];
+        let filteredProducts = [];
+        let currentCategory = 'all';
+        let searchQuery = '';
+        let minPrice = '';
+        let maxPrice = '';
+        let sortBy = 'newest';
+
+        // ===== DOM ELEMENTS =====
+        const container = document.getElementById('allProductsGrid');
+        const spinner = document.getElementById('loadingSpinner');
+        const noProducts = document.getElementById('noProducts');
+        const productCount = document.getElementById('countNumber');
+        const searchInput = document.getElementById('searchInput');
+        const categoryFilter = document.getElementById('categoryFilter');
+        const categoryFilterButtons = document.getElementById('categoryFilterButtons');
+        const minPriceInput = document.getElementById('minPrice');
+        const maxPriceInput = document.getElementById('maxPrice');
+        const sortFilter = document.getElementById('sortFilter');
+        const clearBtn = document.getElementById('clearFilters');
+
+        // ===== INIT =====
+        const user = await checkAuth();
+        updateAuthUI(user);
+        if (user) await syncLocalCartToDB();
+        await updateCartBadge();
+        setupDropdown();
+        setupLogout();
+
+        // ===== LOAD PRODUCTS =====
+        async function loadProducts() {
+            try {
+                spinner.style.display = 'block';
+                const { data, error } = await supabase
+                    .from('products')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+
+                if (error) throw error;
+                allProducts = data || [];
+                filteredProducts = [...allProducts];
+                applyFilters();
+                loadCategoryFilters();
+                spinner.style.display = 'none';
+
+            } catch (error) {
+                console.error('Error loading products:', error);
+                spinner.style.display = 'none';
+                container.innerHTML = `
+                    <div style="text-align:center;padding:40px;color:#EF4444;grid-column:1/-1;">
+                        <i class="fas fa-exclamation-triangle" style="font-size:2rem;display:block;margin-bottom:8px;"></i>
+                        <p>প্রোডাক্ট লোড করতে ব্যর্থ! <br /><small style="color:var(--text-secondary);">${error.message}</small></p>
+                    </div>
+                `;
+            }
         }
-        
-        document.addEventListener('DOMContentLoaded', init);
+
+        // ===== LOAD CATEGORY FILTERS =====
+        async function loadCategoryFilters() {
+            try {
+                const { data: categories } = await supabase
+                    .from('categories')
+                    .select('name')
+                    .order('name');
+
+                // Populate dropdown
+                const dropdown = document.getElementById('categoryFilter');
+                if (categories) {
+                    categories.forEach(cat => {
+                        const option = document.createElement('option');
+                        option.value = cat.name;
+                        option.textContent = cat.name;
+                        dropdown.appendChild(option);
+                    });
+                }
+
+                // Populate category buttons
+                const buttonContainer = document.getElementById('categoryFilterButtons');
+                if (categories) {
+                    categories.forEach(cat => {
+                        const btn = document.createElement('button');
+                        btn.className = 'filter-btn';
+                        btn.dataset.category = cat.name;
+                        btn.textContent = cat.name;
+                        btn.addEventListener('click', () => {
+                            currentCategory = cat.name;
+                            categoryFilter.value = cat.name;
+                            updateCategoryButtons();
+                            applyFilters();
+                        });
+                        buttonContainer.appendChild(btn);
+                    });
+                }
+
+            } catch (error) {
+                console.error('Error loading categories:', error);
+            }
+        }
+
+        // ===== UPDATE CATEGORY BUTTONS =====
+        function updateCategoryButtons() {
+            document.querySelectorAll('.category-filter .filter-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.category === currentCategory);
+            });
+            // Update dropdown
+            categoryFilter.value = currentCategory;
+        }
+
+        // ===== APPLY FILTERS =====
+        function applyFilters() {
+            let result = [...allProducts];
+
+            // 1. Category filter
+            if (currentCategory !== 'all') {
+                result = result.filter(p => p.category === currentCategory);
+            }
+
+            // 2. Search filter
+            if (searchQuery.trim()) {
+                const query = searchQuery.trim().toLowerCase();
+                result = result.filter(p =>
+                    p.name.toLowerCase().includes(query) ||
+                    p.description.toLowerCase().includes(query) ||
+                    p.category.toLowerCase().includes(query)
+                );
+            }
+
+            // 3. Price range filter
+            const min = parseFloat(minPrice);
+            const max = parseFloat(maxPrice);
+            if (!isNaN(min)) {
+                result = result.filter(p => p.price >= min);
+            }
+            if (!isNaN(max)) {
+                result = result.filter(p => p.price <= max);
+            }
+
+            // 4. Sort
+            switch (sortBy) {
+                case 'newest':
+                    result.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+                    break;
+                case 'price-low':
+                    result.sort((a, b) => a.price - b.price);
+                    break;
+                case 'price-high':
+                    result.sort((a, b) => b.price - a.price);
+                    break;
+                case 'name':
+                    result.sort((a, b) => a.name.localeCompare(b.name));
+                    break;
+                default:
+                    break;
+            }
+
+            filteredProducts = result;
+            renderFilteredProducts();
+        }
+
+        // ===== RENDER FILTERED PRODUCTS =====
+        function renderFilteredProducts() {
+            const count = filteredProducts.length;
+            productCount.textContent = count;
+
+            if (count === 0) {
+                noProducts.style.display = 'block';
+                container.innerHTML = '';
+                return;
+            }
+
+            noProducts.style.display = 'none';
+
+            // Use the renderProducts function from products.js
+            // but we need to pass the filtered products
+            container.innerHTML = filteredProducts.map(product => {
+                const imageUrl = getProductImage(product);
+                return `
+                    <div class="product-card">
+                        <img src="${imageUrl}" 
+                             alt="${product.name}" 
+                             class="product-image" 
+                             loading="lazy"
+                             onerror="this.src='https://res.cloudinary.com/demo/image/upload/sample.jpg'; this.onerror=null;" />
+                        <div class="product-info">
+                            <h3>${product.name}</h3>
+                            <p class="product-category">${product.category}</p>
+                            <p class="product-price">৳${product.price.toFixed(2)}</p>
+                            <div class="product-actions">
+                                <button class="btn-primary" onclick="window.addToCart('${product.id}')">
+                                    <i class="fas fa-shopping-bag"></i> অ্যাড
+                                </button>
+                                <button class="btn-outline-light" onclick="window.viewProduct('${product.id}')">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // ===== EVENT LISTENERS =====
+        // Search
+        searchInput.addEventListener('input', (e) => {
+            searchQuery = e.target.value;
+            applyFilters();
+        });
+
+        // Category dropdown
+        categoryFilter.addEventListener('change', (e) => {
+            currentCategory = e.target.value;
+            updateCategoryButtons();
+            applyFilters();
+        });
+
+        // Price range
+        minPriceInput.addEventListener('input', (e) => {
+            minPrice = e.target.value;
+            applyFilters();
+        });
+
+        maxPriceInput.addEventListener('input', (e) => {
+            maxPrice = e.target.value;
+            applyFilters();
+        });
+
+        // Sort
+        sortFilter.addEventListener('change', (e) => {
+            sortBy = e.target.value;
+            applyFilters();
+        });
+
+        // Clear filters
+        clearBtn.addEventListener('click', () => {
+            searchInput.value = '';
+            searchQuery = '';
+            minPriceInput.value = '';
+            maxPriceInput.value = '';
+            minPrice = '';
+            maxPrice = '';
+            currentCategory = 'all';
+            categoryFilter.value = 'all';
+            sortFilter.value = 'newest';
+            sortBy = 'newest';
+            updateCategoryButtons();
+            applyFilters();
+        });
+
+        // ===== GLOBALS =====
+        window.addToCart = addToCart;
+        window.viewProduct = viewProduct;
+
+        // ===== START =====
+        await loadProducts();
     </script>
 </body>
 </html>

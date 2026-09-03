@@ -1,15 +1,87 @@
 <!DOCTYPE html>
 <html lang="bn">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>প্রোডাক্ট ম্যানেজ - রূপকথা</title>
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.5.1/css/all.css" />
     <link rel="stylesheet" href="css/style.css" />
     <link rel="stylesheet" href="css/dark-theme.css" />
+    <link rel="stylesheet" href="css/responsive.css" />
+    <style>
+        .product-card-admin {
+            background: var(--dark-card);
+            border-radius: var(--radius);
+            padding: 16px;
+            border: 1px solid var(--dark-border);
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+        }
+        .product-card-admin:hover {
+            border-color: var(--primary);
+            transform: translateY(-4px);
+            box-shadow: 0 8px 30px rgba(139, 92, 246, 0.1);
+        }
+        .product-card-admin img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 8px;
+            background: var(--dark);
+        }
+        .product-card-admin .info {
+            padding: 12px 0;
+            flex: 1;
+        }
+        .product-card-admin .info h3 {
+            font-size: 1rem;
+            margin-bottom: 4px;
+        }
+        .product-card-admin .info .category {
+            color: var(--text-secondary);
+            font-size: 13px;
+        }
+        .product-card-admin .info .price {
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-top: 4px;
+        }
+        .product-card-admin .actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+        }
+        .product-card-admin .actions button {
+            flex: 1;
+            padding: 8px;
+            font-size: 13px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .btn-edit {
+            background: var(--primary);
+            color: white;
+        }
+        .btn-edit:hover {
+            background: var(--primary-dark);
+        }
+        .btn-delete {
+            background: transparent;
+            color: #EF4444;
+            border: 1px solid #EF4444 !important;
+        }
+        .btn-delete:hover {
+            background: #EF4444;
+            color: white;
+        }
+    </style>
 </head>
 <body>
-    <!-- Navigation Include -->
+    <!-- ===== NAVIGATION ===== -->
     <nav class="navbar" id="mainNav">
         <div class="nav-container">
             <a href="index.html" class="nav-logo">
@@ -36,8 +108,11 @@
                             <i class="fas fa-chevron-down"></i>
                         </button>
                         <div class="dropdown-menu" id="dropdownMenu">
+                            <a href="admin-dashboard.html">📊 ড্যাশবোর্ড</a>
                             <a href="admin-add-product.html">📦 প্রোডাক্ট যোগ</a>
                             <a href="admin-manage-products.html">📋 প্রোডাক্ট লিস্ট</a>
+                            <a href="admin-categories.html">📂 ক্যাটাগরি</a>
+                            <a href="admin-orders.html">📋 অর্ডার</a>
                             <hr />
                             <a href="#" id="logoutBtn">লগআউট</a>
                         </div>
@@ -47,108 +122,165 @@
         </div>
     </nav>
 
-    <!-- Main Content -->
+    <!-- ===== PRODUCT LIST ===== -->
     <section style="padding-top: 120px; padding-bottom: 60px;">
         <div class="container">
-            <div class="section-header">
-                <span class="section-tag">অ্যাডমিন</span>
-                <h2>📋 সব প্রোডাক্ট</h2>
-                <p>এখান থেকে প্রোডাক্ট এডিট বা ডিলিট করুন</p>
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 30px;">
+                <div>
+                    <span class="section-tag">অ্যাডমিন</span>
+                    <h2 style="font-family: 'Playfair Display', serif; font-size: 2.5rem;">📋 প্রোডাক্ট লিস্ট</h2>
+                    <p style="color: var(--text-secondary);">সব প্রোডাক্ট দেখুন, এডিট বা ডিলিট করুন</p>
+                </div>
+                <a href="admin-add-product.html" class="btn-primary">
+                    <i class="fas fa-plus"></i> নতুন প্রোডাক্ট
+                </a>
             </div>
-            <div id="productsList" class="product-grid">
-                <!-- প্রোডাক্ট লোড হবে -->
+
+            <!-- Loading -->
+            <div id="loadingSpinner" style="text-align: center; padding: 40px 0;">
+                <i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: var(--primary);"></i>
+                <p style="color: var(--text-secondary); margin-top: 12px;">প্রোডাক্ট লোড হচ্ছে...</p>
+            </div>
+
+            <!-- Product Grid -->
+            <div id="productsGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px;">
+                <!-- Products will be loaded here -->
+            </div>
+
+            <!-- No Products -->
+            <div id="noProducts" style="display: none; text-align: center; padding: 60px 0;">
+                <i class="fas fa-box-open" style="font-size: 3rem; color: var(--text-secondary);"></i>
+                <h3 style="color: var(--text-secondary); margin-top: 16px;">কোনো প্রোডাক্ট নেই</h3>
+                <p style="color: var(--text-secondary);">প্রথম প্রোডাক্ট যোগ করুন!</p>
+                <a href="admin-add-product.html" class="btn-primary" style="display: inline-block; margin-top: 16px;">
+                    <i class="fas fa-plus"></i> প্রোডাক্ট যোগ করুন
+                </a>
             </div>
         </div>
     </section>
 
+    <!-- ===== TOAST ===== -->
     <div id="toast" class="toast"></div>
 
+    <!-- ===== SCRIPTS ===== -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script type="module">
+        // ===== IMPORTS =====
         import { supabase, supabaseAdmin } from './js/config.js';
-        import { checkAuth, updateAuthUI } from './js/auth.js';
-        import { updateCartBadge } from './js/products.js';
-        import { isAdmin } from './js/admin.js';
+        import { checkAuth, updateAuthUI, setupDropdown, setupLogout } from './js/auth.js';
+        import { updateCartBadge, getProductImage } from './js/products.js';
+        import { isAdmin, deleteProduct } from './js/admin.js';
 
-        // Initialize
+        const DEFAULT_IMG = 'https://res.cloudinary.com/demo/image/upload/sample.jpg';
+
+        // ===== INIT =====
         const user = await checkAuth();
         updateAuthUI(user);
         updateCartBadge();
+        setupDropdown();
+        setupLogout();
 
-        // Admin Check
+        // ===== ADMIN CHECK =====
         const admin = await isAdmin();
         if (!admin) {
-            document.querySelector('.section-header h2').innerHTML = '⛔ অ্যাক্সেস অস্বীকৃত';
-            document.querySelector('.section-header').innerHTML += '<p style="color: #EF4444;">শুধুমাত্র অ্যাডমিন ইউজার এই পেজ দেখতে পারেন।</p>';
-        }
-
-        // Load Products
-        async function loadProducts() {
-            const { data, error } = await supabase
-                .from('products')
-                .select('*')
-                .order('created_at', { ascending: false });
-
-            if (error) {
-                console.error('Error loading products:', error);
-                return;
-            }
-
-            const container = document.getElementById('productsList');
-            container.innerHTML = data.map(product => `
-                <div class="product-card" style="position: relative;">
-                    <img src="${product.image_url}" alt="${product.name}" class="product-image" />
-                    <div class="product-info">
-                        <h3>${product.name}</h3>
-                        <p class="product-category">${product.category}</p>
-                        <p class="product-price">৳${product.price}</p>
-                        <p style="color: var(--text-secondary); font-size: 14px;">স্টক: ${product.stock}</p>
-                        <div style="display: flex; gap: 10px; margin-top: 10px;">
-                            <button class="btn-primary" onclick="editProduct('${product.id}')" style="flex: 1; padding: 8px;">
-                                <i class="fas fa-edit"></i> এডিট
-                            </button>
-                            <button class="btn-outline-light" onclick="deleteProduct('${product.id}')" style="flex: 1; padding: 8px; border-color: #EF4444; color: #EF4444;">
-                                <i class="fas fa-trash"></i> ডিলিট
-                            </button>
-                        </div>
-                    </div>
+            document.querySelector('section').innerHTML = `
+                <div style="text-align: center; padding: 80px 0;">
+                    <i class="fas fa-shield-alt" style="font-size: 3rem; color: #EF4444; display: block; margin-bottom: 16px;"></i>
+                    <h2 style="color: #EF4444;">⛔ অ্যাক্সেস অস্বীকৃত</h2>
+                    <p style="color: var(--text-secondary);">শুধুমাত্র অ্যাডমিন ইউজার এই পেজ দেখতে পারেন।</p>
+                    <a href="index.html" class="btn-primary" style="display: inline-block; margin-top: 16px;">
+                        <i class="fas fa-home"></i> হোমপেজে যান
+                    </a>
                 </div>
-            `).join('');
+            `;
+        } else {
+            loadProducts();
         }
 
-        // Delete Product
-        window.deleteProduct = async (id) => {
-            if (!confirm('আপনি কি এই প্রোডাক্ট ডিলিট করতে চান?')) return;
+        // ===== LOAD PRODUCTS =====
+        async function loadProducts() {
+            const container = document.getElementById('productsGrid');
+            const spinner = document.getElementById('loadingSpinner');
+            const noProducts = document.getElementById('noProducts');
 
             try {
-                const { error } = await supabaseAdmin
+                const { data, error } = await supabase
                     .from('products')
-                    .delete()
-                    .eq('id', id);
+                    .select('*')
+                    .order('created_at', { ascending: false });
 
                 if (error) throw error;
 
-                showToast('✅ প্রোডাক্ট ডিলিট হয়েছে!', 'success');
-                loadProducts();
+                spinner.style.display = 'none';
+
+                if (!data || data.length === 0) {
+                    noProducts.style.display = 'block';
+                    return;
+                }
+
+                noProducts.style.display = 'none';
+
+                container.innerHTML = data.map(product => {
+                    const imageUrl = getProductImage(product) || DEFAULT_IMG;
+                    return `
+                        <div class="product-card-admin">
+                            <img src="${imageUrl}" 
+                                 alt="${product.name}" 
+                                 onerror="this.src='${DEFAULT_IMG}'; this.onerror=null;" />
+                            <div class="info">
+                                <h3>${product.name}</h3>
+                                <p class="category">${product.category}</p>
+                                <p class="price">৳${product.price.toFixed(2)}</p>
+                                <p style="color: var(--text-secondary); font-size: 13px;">স্টক: ${product.stock}</p>
+                            </div>
+                            <div class="actions">
+                                <button class="btn-edit" onclick="editProduct('${product.id}')">
+                                    <i class="fas fa-edit"></i> এডিট
+                                </button>
+                                <button class="btn-delete" onclick="deleteProduct('${product.id}')">
+                                    <i class="fas fa-trash"></i> ডিলিট
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                // Make functions globally available
+                window.editProduct = (id) => {
+                    window.location.href = `admin-edit-product.html?id=${id}`;
+                };
+
+                window.deleteProduct = async (id) => {
+                    if (!confirm('আপনি কি এই প্রোডাক্ট ডিলিট করতে চান?')) return;
+                    try {
+                        await deleteProduct(id);
+                        showToast('✅ প্রোডাক্ট ডিলিট করা হয়েছে!', 'success');
+                        loadProducts();
+                    } catch (error) {
+                        showToast('❌ ' + error.message, 'error');
+                    }
+                };
+
             } catch (error) {
-                showToast('❌ ' + error.message, 'error');
+                console.error('Error loading products:', error);
+                spinner.style.display = 'none';
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 40px; grid-column: 1 / -1; color: #EF4444;">
+                        <i class="fas fa-exclamation-triangle" style="font-size: 2rem; display: block; margin-bottom: 12px;"></i>
+                        <p>প্রোডাক্ট লোড করতে ব্যর্থ!</p>
+                        <p style="font-size: 14px; color: var(--text-secondary);">${error.message}</p>
+                    </div>
+                `;
             }
-        };
+        }
 
-        // Edit Product
-        window.editProduct = (id) => {
-            window.location.href = `admin-edit-product.html?id=${id}`;
-        };
-
-        // Toast
+        // ===== TOAST =====
         function showToast(message, type = 'info') {
             const toast = document.getElementById('toast');
             toast.textContent = message;
             toast.className = `toast show ${type}`;
             setTimeout(() => toast.classList.remove('show'), 3000);
         }
-
-        loadProducts();
     </script>
 </body>
 </html>
